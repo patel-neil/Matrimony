@@ -1,16 +1,18 @@
-import {React,useEffect} from 'react';
+import {React, useEffect} from 'react';
 import { UserButton, SignInButton, useUser } from "@clerk/clerk-react";
-import { Bell, Heart, Search, LogIn } from 'lucide-react';
+import { Bell, Heart, Search, LogIn, Shield } from 'lucide-react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+
 const HomePage = () => {
-  const { user,isSignedIn } = useUser();
+  const { user, isSignedIn } = useUser();
 
   // Function to send user details to the backend
   const saveUserToDB = async () => {
     if (!user) return; // Ensure user is available
 
     try {
-      const response = await axios.post("http://localhost:5000/api/save-user", {
+      const response = await axios.post("http://localhost:5000/api/users/save-user", {
         id: user.id,
         username: user.username || user.firstName || user.emailAddresses[0]?.emailAddress.split("@")[0],
         email: user.emailAddresses[0]?.emailAddress,
@@ -48,12 +50,18 @@ const HomePage = () => {
             <a href="/matches" className="text-gray-600 hover:text-rose-600">Matches</a>
             <a href="/chat" className="text-gray-600 hover:text-rose-600">Chat</a>
             <a href="/profile" className="text-gray-600 hover:text-rose-600">Profile</a>
-
-
           </div>
 
           {/* Right Section */}
           <div className="flex items-center space-x-4">
+            {/* Admin Login Button */}
+            <Link to="/admin-login">
+              <button className="flex items-center space-x-2 bg-gray-700 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors">
+                <Shield className="h-5 w-5" />
+                <span>Admin</span>
+              </button>
+            </Link>
+            
             {isSignedIn ? (
               <>
                 <Bell className="h-5 w-5 text-gray-600 cursor-pointer hover:text-rose-600" />
