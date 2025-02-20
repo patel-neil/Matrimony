@@ -19,7 +19,24 @@ const ProfileSystem = () => {
     dateOfBirth: '',
     gender: '',
     maritalStatus: '',
+  //
+    // Physical Information
+    height: '',
+    weight: '',
+    bodyType: '',
+    skinTone: '',
+    physicalDisability: '',
+    disabilityDetails: '',
+    bloodGroup: '',
+    hairTypeColor: '',
+    eyeColor: '',
+    medicalConditions: '',
+    pastSurgeries: '',
+    surgeryDetails: '',
+    piercingsTattoos: '',
 
+
+  //
     // Location
     city: '',
     country: '',
@@ -79,7 +96,7 @@ const ProfileSystem = () => {
     aboutYourself: ''
   });
 
-  const TOTAL_STEPS = 7;
+  const TOTAL_STEPS = 10;
 
   useEffect(() => {
     // Load saved form data from localStorage
@@ -177,6 +194,7 @@ const ProfileSystem = () => {
       </div>
     </div>
   );
+  
 
   const renderBasicInfo = () => (
     <div className="space-y-6">
@@ -243,6 +261,241 @@ const ProfileSystem = () => {
       </div>
     </div>
   );
+  
+  const renderPhysicalInformation = () => (
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold">Physical Information</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        {/* Height */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Height
+          </label>
+          <input
+            type="text"
+            name="height"
+            value={formData.height}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder='Enter Height (e.g., 5"8")'
+            required
+          />
+        </div>
+  
+        {/* Weight */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Weight (kg)
+          </label>
+          <input
+            type="number"
+            name="weight"
+            value={formData.weight}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter Weight (Optional)"
+          />
+        </div>
+  
+        {/* Body Type */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Body Type
+          </label>
+          <select
+            name="bodyType"
+            value={formData.bodyType}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Select Body Type</option>
+            <option value="slim">Slim</option>
+            <option value="athletic">Athletic</option>
+            <option value="average">Average</option>
+            <option value="heavy">Heavy</option>
+          </select>
+        </div>
+  
+        {/* Skin Tone */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Skin Tone
+          </label>
+          <select
+            name="skinTone"
+            value={formData.skinTone}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Select Skin Tone</option>
+            <option value="fair">Fair</option>
+            <option value="wheatish">Wheatish</option>
+            <option value="dusky">Dusky</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+  
+        {/* Physical Disability */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Physical Disability
+          </label>
+          <select
+            name="physicalDisability"
+            value={formData.physicalDisability}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Select</option>
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+          </select>
+          {formData.physicalDisability === 'yes' && (
+            <input
+              type="text"
+              name="disabilityDetails"
+              value={formData.disabilityDetails}
+              onChange={handleInputChange}
+              className="w-full p-2 mt-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Please specify the disability"
+            />
+          )}
+        </div>
+  
+        {/* Blood Group */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Blood Group
+          </label>
+          <select
+            name="bloodGroup"
+            value={formData.bloodGroup}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Select Blood Group</option>
+            {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(group => (
+              <option key={group} value={group}>{group}</option>
+            ))}
+          </select>
+        </div>
+  
+        {/* Hair Type & Color */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Hair Type & Color
+          </label>
+          <input
+            type="text"
+            name="hairTypeColor"
+            value={formData.hairTypeColor}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="e.g., Straight Black, Curly Brown, Balding"
+          />
+        </div>
+  
+        {/* Eye Color */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Eye Color
+          </label>
+          <select
+            name="eyeColor"
+            value={formData.eyeColor}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Select Eye Color</option>
+            <option value="black">Black</option>
+            <option value="brown">Brown</option>
+            <option value="blue">Blue</option>
+            <option value="green">Green</option>
+            <option value="hazel">Hazel</option>
+          </select>
+        </div>
+  
+        {/* Medical Conditions */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Medical Conditions
+          </label>
+          <input
+            type="text"
+            name="medicalConditions"
+            value={formData.medicalConditions}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="e.g., Diabetes, Hypertension (Optional)"
+          />
+        </div>
+  
+        {/* Past Surgeries or Major Health Issues */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Past Surgeries / Major Health Issues
+          </label>
+          <select
+            name="pastSurgeries"
+            value={formData.pastSurgeries}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Select</option>
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+          </select>
+          {formData.pastSurgeries === 'yes' && (
+            <input
+              type="text"
+              name="surgeryDetails"
+              value={formData.surgeryDetails}
+              onChange={handleInputChange}
+              className="w-full p-2 mt-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Specify surgery/health issue details"
+            />
+          )}
+        </div>
+  
+        {/* Piercings / Tattoos */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Piercings / Tattoos
+          </label>
+          <select
+            name="piercingsTattoos"
+            value={formData.piercingsTattoos}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Select</option>
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+          </select>
+        </div>
+  
+        {/* Fitness Level */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Fitness Level
+          </label>
+          <select
+            name="fitnessLevel"
+            value={formData.fitnessLevel}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Select Fitness Level</option>
+            <option value="sedentary">Sedentary</option>
+            <option value="active">Active</option>
+            <option value="veryFit">Very Fit</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  );
+  
 
   const renderReligionCommunity = () => (
     <div className="space-y-6">
@@ -434,7 +687,96 @@ const ProfileSystem = () => {
       </div>
     </div>
   );
+//
 
+const renderBasicDetails = () => (
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold">Basic Details</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Marital Status
+          </label>
+          <select
+            name="maritalStatus"
+            value={formData.maritalStatus}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            required
+          >
+            <option value="">Select Marital Status</option>
+            <option value="neverMarried">Never Married</option>
+            <option value="divorced">Divorced</option>
+            <option value="widowed">Widowed</option>
+            <option value="separated">Separated</option>
+          </select>
+        </div>
+  
+       
+  
+       
+  
+       
+  
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Mother Tongue
+          </label>
+          <select
+            name="motherTongue"
+            value={formData.motherTongue}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            required
+          >
+            <option value="">Select Mother Tongue</option>
+            <option value="hindi">Hindi</option>
+            <option value="english">English</option>
+            <option value="tamil">Tamil</option>
+            <option value="telugu">Telugu</option>
+            <option value="bengali">Bengali</option>
+            <option value="marathi">Marathi</option>
+            <option value="punjabi">Punjabi</option>
+            <option value="gujarati">Gujarati</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+  
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Community
+          </label>
+          <input
+            type="text"
+            name="community"
+            value={formData.community}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter Community"
+            required
+          />
+        </div>
+  
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Sub-Community
+          </label>
+          <input
+            type="text"
+            name="subCommunity"
+            value={formData.subCommunity}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter Sub-Community"
+            required
+          />
+        </div>
+      </div>
+    </div>
+  );
+  
+
+//
   const renderEducationCareer = () => (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold">Education & Career</h2>
@@ -499,7 +841,8 @@ const ProfileSystem = () => {
             required
           />
         </div>
-
+         
+         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Work Location
@@ -597,6 +940,125 @@ const ProfileSystem = () => {
       </div>
     </div>
   );
+  const renderFamilyDetails = () => (
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold">Family Details</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Family Type *</label>
+          <select
+            name="familyType"
+            value={formData.familyType}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            required
+          >
+            <option value="">Select Family Type</option>
+            <option value="joint">Joint</option>
+            <option value="nuclear">Nuclear</option>
+            <option value="extended">Extended</option>
+          </select>
+        </div>
+  
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Family Status *</label>
+          <select
+            name="familyStatus"
+            value={formData.familyStatus}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            required
+          >
+            <option value="">Select Family Status</option>
+            <option value="middle">Middle Class</option>
+            <option value="upperMiddle">Upper Middle Class</option>
+            <option value="affluent">Affluent</option>
+          </select>
+        </div>
+  
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Family Values *</label>
+          <select
+            name="familyValues"
+            value={formData.familyValues}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            required
+          >
+            <option value="">Select Family Values</option>
+            <option value="traditional">Traditional</option>
+            <option value="moderate">Moderate</option>
+            <option value="liberal">Liberal</option>
+          </select>
+        </div>
+  
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Father's Occupation</label>
+          <input
+            type="text"
+            name="fatherOccupation"
+            value={formData.fatherOccupation}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="e.g., Retired Teacher, Businessman"
+          />
+        </div>
+  
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Mother's Occupation</label>
+          <input
+            type="text"
+            name="motherOccupation"
+            value={formData.motherOccupation}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="e.g., Homemaker, Doctor"
+          />
+        </div>
+  
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Number of Brothers</label>
+          <input
+            type="number"
+            name="brothers"
+            value={formData.brothers}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            min="0"
+            placeholder="e.g., 2"
+          />
+        </div>
+  
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Number of Sisters</label>
+          <input
+            type="number"
+            name="sisters"
+            value={formData.sisters}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            min="0"
+            placeholder="e.g., 1"
+          />
+        </div>
+  
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Family Contact Number</label>
+          <input
+            type="tel"
+            name="familyContact"
+            value={formData.familyContact}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="e.g., +91 9876543210"
+          />
+        </div>
+  
+      </div>
+    </div>
+  );
+  
 
   const renderAboutYourself = () => (
     <div className="space-y-6">
@@ -626,17 +1088,27 @@ const ProfileSystem = () => {
       case 1:
         return renderBasicInfo();
       case 2:
-        return renderLocation();
+        return renderBasicDetails();
       case 3:
-        return renderReligionCommunity();
+        return renderLocation();
+        
       case 4:
-        return renderHoroscope();
+        return renderReligionCommunity();
+       
       case 5:
+
         return renderEducationCareer();
       case 6:
         return renderLifestyleInterests();
       case 7:
-        return renderAboutYourself();
+        return renderHoroscope();
+        case 8:
+        return renderPhysicalInformation();
+
+        case 9:
+        return renderFamilyDetails();
+        case 10:
+            return  renderAboutYourself();
       default:
         return null;
     }
@@ -832,7 +1304,7 @@ const ProfileSystem = () => {
           </div>
         </div>
 
-        {/* Social Media Links */}
+        Social Media Links
         <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
           <div className="flex items-center space-x-3 mb-4">
             <Share2 className="w-6 h-6 text-gray-600" />
@@ -883,4 +1355,3 @@ const ProfileSystem = () => {
 };
 
 export default ProfileSystem;
-
