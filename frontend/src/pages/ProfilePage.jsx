@@ -1354,8 +1354,5 @@ const renderBasicDetails = () => (
   );
 };
 
-<<<<<<< HEAD
+
 export default ProfileSystem;
-=======
-export default ProfileSystem;
->>>>>>> a8218027fdeaea373ba96f65cefd752f3efef181
