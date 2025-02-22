@@ -48,8 +48,10 @@ const HomePage = () => {
             <a href="/" className="text-gray-600 hover:text-rose-600">Home</a>
             <a href="/search" className="text-gray-600 hover:text-rose-600">Search</a>
             <a href="/matches" className="text-gray-600 hover:text-rose-600">Matches</a>
-            <a href="/chat" className="text-gray-600 hover:text-rose-600">Chat</a>
+            <a href="/notifications" className="text-gray-600 hover:text-rose-600">Chat</a>
             <a href="/profile" className="text-gray-600 hover:text-rose-600">Profile</a>
+            <a href="/partner-preference" className="text-gray-600 hover:text-rose-600">Preference</a>
+
           </div>
 
           {/* Right Section */}

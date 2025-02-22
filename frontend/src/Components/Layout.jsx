@@ -22,6 +22,7 @@ const Layout = ({ children }) => {
             <Link to="/search" className="text-gray-600 hover:text-rose-600">Search</Link>
             <Link to="/matches" className="text-gray-600 hover:text-rose-600">Matches</Link>
             <Link to="/chat" className="text-gray-600 hover:text-rose-600">Chat</Link>
+            <Link to="/preference" className="text-gray-600 hover:text-rose-600">Preferences</Link> 
           </div>
 
           {/* Right Section */}

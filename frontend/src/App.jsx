@@ -7,6 +7,8 @@ import MatchesPage from './pages/MatchesPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminLogin from './pages/adminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import PartnerPreferencePage from './pages/preference';
+import notifications from './pages/ChatPage';
 
 function App() {
   return (
@@ -29,10 +31,14 @@ function App() {
           path="/admin-dashboard"
           element={
               <AdminDashboard />
+              
           }
         />
         
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/partner-preference" element={<PartnerPreferencePage />} />
+        <Route path="/chat" element={<ChatPage />} />
+
         <Route path="/matches" element={<MatchesPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
