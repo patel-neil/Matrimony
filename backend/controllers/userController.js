@@ -26,4 +26,21 @@ const saveUser = async (req, res) => {
   }
 };
 
-module.exports = { saveUser };
+const getUserByEmail = async (req, res) => {
+  try {
+    const { email } = req.params;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ userId: user._id, email: user.email });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+module.exports = { saveUser, getUserByEmail };

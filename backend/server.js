@@ -6,7 +6,7 @@ const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-
+const preferenceRoutes = require("./routes/preferenceRoutes"); // ✅ Added Partner Preferences API
 
 const app = express();
 
@@ -22,7 +22,7 @@ connectDB();
 app.use("/api/users", userRoutes);
 app.use("/api/chats", chatRoutes);
 app.use("/api/admin", adminRoutes);
-
+app.use("/api/preferences", preferenceRoutes); // ✅ Added Partner Preferences Route
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

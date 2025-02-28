@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useUser } from "@clerk/clerk-react"; // ✅ Import Clerk's authentication hook
 
 const PartnerPreferencePage = () => {
+
+  const { user } = useUser();
+  const userEmail = user?.primaryEmailAddress?.emailAddress;
+  const [userId, setUserId] = useState(null);
+
   // Essential Preferences (Mandatory)
   const [essentialPrefs, setEssentialPrefs] = useState({
     ageRange: { min: 25, max: 35 },
@@ -26,6 +32,52 @@ const PartnerPreferencePage = () => {
   // Form validation state
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
+
+  useEffect(() => {
+    if (!userEmail) return;
+
+    const fetchUserId = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/users/getUser/${userEmail}`);
+        
+        // ✅ Log raw response to debug
+        const text = await response.text();
+        console.log("Raw response:", text);
+
+        const data = JSON.parse(text);
+        if (response.ok) {
+          setUserId(data.userId);
+        } else {
+          console.error("Error:", data.error);
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+
+    fetchUserId();
+  }, [userEmail]);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchPreferences = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/preferences/${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setEssentialPrefs(data.essentialPrefs);
+          setOptionalPrefs(data.optionalPrefs);
+          setIsUpdate(true);
+        }
+      } catch (error) {
+        console.error("Error fetching preferences:", error);
+      }
+    };
+
+    fetchPreferences();
+  }, [userId]);
 
   // Options for dropdown menus
   const options = {
@@ -119,23 +171,45 @@ const PartnerPreferencePage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitted(true);
-    
+
     if (validateForm()) {
-      // In a real app, you would send this data to your backend
-      console.log("Form submitted successfully!", {
-        essentialPreferences: essentialPrefs,
-        optionalPreferences: optionalPrefs
-      });
-      
-      // Show success message or redirect
-      alert("Partner preferences saved successfully!");
+      console.log("Submitting preferences:", { essentialPrefs, optionalPrefs });
+      savePreferences();
     } else {
-      // Scroll to the first error
-      const firstErrorField = Object.keys(errors)[0];
-      const element = document.getElementById(firstErrorField);
-      if (element) element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      alert("Please fix the errors before submitting.");
     }
   };
+
+  const savePreferences = async () => {
+    if (!userId) {
+      alert("User ID not found. Please refresh.");
+      return;
+    }
+
+    try {
+      const endpoint = isUpdate
+        ? "http://localhost:5000/api/preferences/update"
+        : "http://localhost:5000/api/preferences/save";
+
+      const response = await fetch(endpoint, {
+        method: isUpdate ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, essentialPrefs, optionalPrefs }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert(isUpdate ? "Preferences updated!" : "Preferences saved!");
+        setIsUpdate(true);
+      } else {
+        alert(`Error: ${data.error || "Something went wrong"}`);
+      }
+    } catch (error) {
+      console.error("Error saving preferences:", error);
+      alert("Network error. Check backend.");
+    }
+  };
+  
 
   // Helper function to format height
   const formatHeight = (cm) => {
@@ -564,7 +638,8 @@ const PartnerPreferencePage = () => {
           {/* Submit Button */}
           <div className="text-center">
             <button
-              type="submit"
+              type="button"
+              onClick={handleSubmit}
               className="px-8 py-3 bg-rose-600 text-white font-medium rounded-md shadow-md hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-opacity-50 transition-colors"
             >
               Save My Partner Preferences
