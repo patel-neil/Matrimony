@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { SignedIn, SignedOut, SignInButton } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, SignInButton, useUser } from "@clerk/clerk-react";
+import { useEffect } from "react";
+
 import HomePage from './pages/HomePage';
 import ChatPage from './pages/ChatPage';
 import SearchPage from './pages/SearchPage';
@@ -8,9 +10,21 @@ import ProfilePage from './pages/ProfilePage';
 import AdminLogin from './pages/adminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import PartnerPreferencePage from './pages/preference';
-import notifications from './pages/ChatPage';
 
 function App() {
+  const { user } = useUser(); // Get logged-in user
+
+  useEffect(() => {
+    if (user) {
+      const userData = {
+        email: user.primaryEmailAddress?.emailAddress,
+        id: user.id
+      };
+
+      localStorage.setItem("user", JSON.stringify(userData)); // Store user details
+    }
+  }, [user]); // Runs when `user` changes
+
   return (
     <Router>
       <Routes>
@@ -27,22 +41,13 @@ function App() {
             </SignedIn>
           }
         />
-        <Route
-          path="/admin-dashboard"
-          element={
-              <AdminDashboard />
-              
-          }
-        />
-        
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/partner-preference" element={<PartnerPreferencePage />} />
-        <Route path="/chat" element={<ChatPage />} />
-
         <Route path="/matches" element={<MatchesPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        {/* Fallback Route (Optional) */}
+        
+        {/* Fallback Route */}
         <Route
           path="*"
           element={

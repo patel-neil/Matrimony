@@ -11,121 +11,112 @@ const ProfileSystem = () => {
   const [loading, setLoading] = useState(false);
   const Navigate = useNavigate();
   const [formData, setFormData] = useState({
-    // Basic Info
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    dateOfBirth: '',
-    gender: '',
-    maritalStatus: '',
-  //
-    // Physical Information
-    height: '',
-    weight: '',
-    bodyType: '',
-    skinTone: '',
-    physicalDisability: '',
-    disabilityDetails: '',
-    bloodGroup: '',
-    hairTypeColor: '',
-    eyeColor: '',
-    medicalConditions: '',
-    pastSurgeries: '',
-    surgeryDetails: '',
-    piercingsTattoos: '',
-
-
-  //
-    // Location
-    city: '',
-    country: '',
-    state: '',
-    pincode: '',
-
-    // Religion & Community
-    religion: '',
-    caste: '',
-    subCaste: '',
-    community: '',
-
-    // Horoscope
-    birthTime: '',
-    birthPlace: '',
-    gothra: '',
-    manglik: '',
-    
-    // Education & Career
-    education: '',
-    occupation: '',
-    employer: '',
-    annualIncome: '',
-    workLocation: '',
-
-    // Lifestyle & Interests
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    dateOfBirth: "",
+    gender: "",
+    maritalStatus: "",
+    height: "",
+    weight: "",
+    bodyType: "",
+    skinTone: "",
+    physicalDisability: "",
+    disabilityDetails: "",
+    bloodGroup: "",
+    hairTypeColor: "",
+    eyeColor: "",
+    medicalConditions: "",
+    pastSurgeries: "",
+    surgeryDetails: "",
+    piercingsTattoos: "",
+    city: "",
+    country: "",
+    state: "",
+    pincode: "",
+    religion: "",
+    caste: "",
+    subCaste: "",
+    community: "",
+    birthTime: "",
+    birthPlace: "",
+    gothra: "",
+    manglik: "",
+    education: "",
+    occupation: "",
+    employer: "",
+    annualIncome: "",
+    workLocation: "",
     hobbies: [],
     interests: [],
-    diet: '',
-    smoking: '',
-    drinking: '',
-
-    // Privacy Settings
-    profileVisibility: 'all',
-    contactPreference: 'all',
+    diet: "",
+    smoking: "",
+    drinking: "",
+    profileVisibility: "all",
+    contactPreference: "all",
     showPhone: false,
     showEmail: false,
-
-    // Social Media
-    linkedin: '',
-    instagram: '',
-
-    // Documents
+    linkedin: "",
+    instagram: "",
     aadharCard: null,
     educationCertificate: null,
     incomeCertificate: null,
+    partnerAgeRange: "",
+    partnerHeight: "",
+    partnerEducation: "",
+    partnerOccupation: "",
+    partnerLocation: "",
+    partnerIncome: "",
+    aboutYourself: ""
+});
 
-    // Partner Preferences
-    partnerAgeRange: '',
-    partnerHeight: '',
-    partnerEducation: '',
-    partnerOccupation: '',
-    partnerLocation: '',
-    partnerIncome: '',
-
-    // About Yourself
-    aboutYourself: ''
-  });
 
   const TOTAL_STEPS = 10;
 
   useEffect(() => {
-    // Load saved form data from localStorage
-    const savedData = localStorage.getItem('matrimonialFormData');
-    if (savedData) {
-      setFormData(JSON.parse(savedData));
-    }
+    const fetchUserData = async () => {
+        try {
+            const storedUser = JSON.parse(localStorage.getItem("user"));
 
-    return () => {
-      if (autoSaveTimer) clearTimeout(autoSaveTimer);
+            if (!storedUser || !storedUser.email) {
+                console.error("No user found in localStorage");
+                return;
+            }
+
+            const userEmail = storedUser.email; // Get stored email
+
+            const response = await fetch(`http://localhost:5000/api/users/getUser/${userEmail}`);
+            const data = await response.json();
+
+            if (response.ok) {
+                setFormData(prev => ({
+                    ...prev,
+                    email: data.email,
+                    phone: data.phoneNumber
+                }));
+            } else {
+                console.error("Error fetching user details:", data.error);
+            }
+        } catch (error) {
+            console.error("Error fetching profile:", error);
+        }
     };
-  }, []);
+
+    fetchUserData();
+}, []);
+
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
 
-    // Auto-save after 1 second of inactivity
-    if (autoSaveTimer) clearTimeout(autoSaveTimer);
-    const timer = setTimeout(() => {
-      localStorage.setItem('matrimonialFormData', JSON.stringify({
-        ...formData,
-        [name]: value
-      }));
-    }, 1000);
-    setAutoSaveTimer(timer);
+    if (name === "email" || name === "phone") return; // Prevent email/phone changes
+
+    setFormData(prev => ({
+        ...prev,
+        [name]: value || "" // Ensure no undefined values
+    }));
   };
 
   const handleImageUpload = (e) => {
@@ -195,6 +186,40 @@ const ProfileSystem = () => {
     </div>
   );
   
+  const handleProfileSave = async () => {
+    try {
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+
+        if (!storedUser || !storedUser.email) {
+            console.error("User not found in localStorage");
+            return;
+        }
+
+        const updatedFormData = {
+            ...formData,
+            email: storedUser.email,
+            phone: storedUser.phone || formData.phone, // Prevent undefined values
+        };
+
+        const response = await fetch("http://localhost:5000/api/profiles/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedFormData),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("Profile saved successfully!");
+        } else {
+            console.error("Error saving profile:", data.message);
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+};
+
+
 
   const renderBasicInfo = () => (
     <div className="space-y-6">
@@ -239,9 +264,8 @@ const ProfileSystem = () => {
             type="email"
             name="email"
             value={formData.email}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            required
+            readOnly
+            className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
           />
         </div>
 
@@ -253,9 +277,8 @@ const ProfileSystem = () => {
             type="tel"
             name="phone"
             value={formData.phone}
-            onChange={handleInputChange}
-            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            required
+            readOnly
+            className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
           />
         </div>
       </div>
