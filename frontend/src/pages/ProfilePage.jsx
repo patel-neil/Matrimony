@@ -734,12 +734,6 @@ const renderBasicDetails = () => (
           </select>
         </div>
   
-       
-  
-       
-  
-       
-  
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Mother Tongue
@@ -1182,6 +1176,55 @@ const renderBasicDetails = () => (
     return Math.round((step / TOTAL_STEPS) * 100);
   };
 
+  const handleSaveSocialMedia = async () => {
+    // Regular expressions to validate LinkedIn and Instagram URLs
+    const linkedinRegex = /^https?:\/\/(www\.)?linkedin\.com\/.*$/;
+    const instagramRegex = /^https?:\/\/(www\.)?instagram\.com\/.*$/;
+
+    if (formData.linkedin && !linkedinRegex.test(formData.linkedin)) {
+        alert("Invalid LinkedIn URL. Please enter a valid LinkedIn profile link.");
+        return;
+    }
+
+    if (formData.instagram && !instagramRegex.test(formData.instagram)) {
+        alert("Invalid Instagram URL. Please enter a valid Instagram profile link.");
+        return;
+    }
+
+    try {
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (!storedUser || !storedUser.email) {
+            console.error("User not found in localStorage");
+            return;
+        }
+
+        const updatedData = {
+            email: storedUser.email,
+            linkedin: formData.linkedin,
+            instagram: formData.instagram
+        };
+
+        const response = await fetch("http://localhost:5000/api/profile/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedData),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("Social media links saved successfully!");
+        } else {
+            console.error("Error saving social media links:", data.message);
+            alert(`Error: ${data.message}`);
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+};
+
+
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-3xl mx-auto px-4">
@@ -1277,65 +1320,8 @@ const renderBasicDetails = () => (
           </div>
         )}
 
-        {/* Privacy Settings Panel */}
-        <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
-          <div className="flex items-center space-x-3 mb-4">
-            <Lock className="w-6 h-6 text-gray-600" />
-            <h3 className="text-lg font-medium">Privacy Settings</h3>
-          </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Profile Visibility
-              </label>
-              <select
-                name="profileVisibility"
-                value={formData.profileVisibility}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="all">Visible to All Members</option>
-                <option value="premium">Premium Members Only</option>
-                <option value="matches">Matched Profiles Only</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Contact Preferences
-              </label>
-              <div className="space-y-2">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="showPhone"
-                    checked={formData.showPhone}
-                    onChange={(e) => handleInputChange({
-                      target: { name: 'showPhone', value: e.target.checked }
-                    })}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-600">Show phone number to matches</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="showEmail"
-                    checked={formData.showEmail}
-                    onChange={(e) => handleInputChange({
-                      target: { name: 'showEmail', value: e.target.checked }
-                    })}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-600">Show email to matches</span>
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        Social Media Links
+       {/* Social Media Links */}
         <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
           <div className="flex items-center space-x-3 mb-4">
             <Share2 className="w-6 h-6 text-gray-600" />
@@ -1370,8 +1356,17 @@ const renderBasicDetails = () => (
                 className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
+
+            {/* Save Button */}
+            <button
+              onClick={handleSaveSocialMedia}
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Save Social Media Links
+            </button>
           </div>
         </div>
+
 
         {/* Auto-save Indicator */}
         {autoSaveTimer && (
