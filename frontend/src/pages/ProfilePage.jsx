@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Upload, Camera, MapPin, Book, Briefcase, Heart, Lock, CheckCircle, Share2, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
+import { getUserProfile, saveProfile } from "../assets/api";
 const ProfileSystem = () => {
   const [step, setStep] = useState(1);
   const [profileImage, setProfileImage] = useState(null);
@@ -41,8 +41,6 @@ const ProfileSystem = () => {
     community: "",
     birthTime: "",
     birthPlace: "",
-    gothra: "",
-    manglik: "",
     education: "",
     occupation: "",
     employer: "",
@@ -62,12 +60,6 @@ const ProfileSystem = () => {
     aadharCard: null,
     educationCertificate: null,
     incomeCertificate: null,
-    partnerAgeRange: "",
-    partnerHeight: "",
-    partnerEducation: "",
-    partnerOccupation: "",
-    partnerLocation: "",
-    partnerIncome: "",
     aboutYourself: ""
 });
 
@@ -78,22 +70,23 @@ const ProfileSystem = () => {
     const fetchUserData = async () => {
         try {
             const storedUser = JSON.parse(localStorage.getItem("user"));
-
             if (!storedUser || !storedUser.email) {
                 console.error("No user found in localStorage");
                 return;
             }
+            const userEmail = storedUser.email;
 
-            const userEmail = storedUser.email; // Get stored email
-
-            const response = await fetch(`http://localhost:5000/api/users/getUser/${userEmail}`);
+            const response = await fetch(`http://localhost:5000/api/profile/getUser/${userEmail}`);
             const data = await response.json();
 
             if (response.ok) {
+                // Convert dateOfBirth to a string in YYYY-MM-DD format for the input field
+                if (data.dateOfBirth) {
+                    data.dateOfBirth = new Date(data.dateOfBirth).toISOString().split('T')[0];
+                }
                 setFormData(prev => ({
                     ...prev,
-                    email: data.email,
-                    phone: data.phoneNumber
+                    ...data  // Spread all fetched data into state
                 }));
             } else {
                 console.error("Error fetching user details:", data.error);
@@ -105,6 +98,8 @@ const ProfileSystem = () => {
 
     fetchUserData();
 }, []);
+
+
 
 
 
@@ -197,13 +192,15 @@ const ProfileSystem = () => {
 
         const updatedFormData = {
             ...formData,
-            email: storedUser.email,
-            phone: storedUser.phone || formData.phone, // Prevent undefined values
+            email: storedUser.email, 
+            phone: storedUser.phone || formData.phone
         };
 
-        const response = await fetch("http://localhost:5000/api/profiles/save", {
+        const response = await fetch("http://localhost:5000/api/profile/save", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json" 
+            },
             body: JSON.stringify(updatedFormData),
         });
 
@@ -213,11 +210,13 @@ const ProfileSystem = () => {
             alert("Profile saved successfully!");
         } else {
             console.error("Error saving profile:", data.message);
+            alert(`Error: ${data.message}`);
         }
     } catch (error) {
         console.error("Error:", error);
     }
 };
+
 
 
 
@@ -581,7 +580,7 @@ const ProfileSystem = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Time of Birth
+            Date of Birth
           </label>
           <input
            type="date"
@@ -1154,21 +1153,30 @@ const renderBasicDetails = () => (
   const submitProfile = async () => {
     setLoading(true);
     try {
-      // Here you would normally:
-      // 1. Upload images to S3/Cloudinary
-      // 2. Upload documents
-      // 3. Submit form data to backend
-      // 4. Handle verification process
-      
-      console.log('Profile submitted:', formData);
-      Navigate('/');
-      setVerificationStatus('pending');
+        console.log("Submitting profile:", formData); // Debugging
+
+        const response = await fetch("http://localhost:5000/api/profile/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("Profile submitted successfully!");
+            Navigate('/');  // Redirect to home page after submission
+        } else {
+            console.error("Error submitting profile:", data.message);
+            alert(`Error: ${data.message}`);
+        }
     } catch (error) {
-      console.error('Error submitting profile:', error);
+        console.error("Error:", error);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
 
   const calculateProgress = () => {
     return Math.round((step / TOTAL_STEPS) * 100);

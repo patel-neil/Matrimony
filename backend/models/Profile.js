@@ -1,20 +1,15 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const profileSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, unique: true },
-    
-    // Basic Info
     firstName: String,
     lastName: String,
     email: { type: String, required: true, unique: true },
-    phone: { type: String, required: true, unique: true },
-    dateOfBirth: String,
+    phone: String,
+    dateOfBirth: Date,
     gender: String,
     maritalStatus: String,
-
-    // Physical Information
     height: String,
-    weight: String,
+    weight: Number,
     bodyType: String,
     skinTone: String,
     physicalDisability: String,
@@ -26,64 +21,46 @@ const profileSchema = new mongoose.Schema({
     pastSurgeries: String,
     surgeryDetails: String,
     piercingsTattoos: String,
-
-    // Location
     city: String,
-    country: String,
     state: String,
+    country: String,
     pincode: String,
-
-    // Religion & Community
     religion: String,
     caste: String,
     subCaste: String,
     community: String,
-
-    // Horoscope
     birthTime: String,
-    birthPlace: String,
-    gothra: String,
-    manglik: String,
-
-    // Education & Career
-    education: String,
+    dateOfBirth: { type: Date, required: true },    education: String,
     occupation: String,
     employer: String,
-    annualIncome: String,
+    annualIncome: Number,
     workLocation: String,
-
-    // Lifestyle & Interests
     hobbies: [String],
     interests: [String],
     diet: String,
     smoking: String,
     drinking: String,
-
-    // Privacy Settings
-    profileVisibility: { type: String, default: "all" },
-    contactPreference: { type: String, default: "all" },
-    showPhone: { type: Boolean, default: false },
-    showEmail: { type: Boolean, default: false },
-
-    // Social Media
+    profileVisibility: String,
+    contactPreference: String,
+    showPhone: Boolean,
+    showEmail: Boolean,
     linkedin: String,
     instagram: String,
-
-    // Documents (store file paths)
-    aadharCard: String,
+    aadharCard: String, // Store as URL or base64 string
     educationCertificate: String,
     incomeCertificate: String,
-
-    // Partner Preferences
-    partnerAgeRange: String,
-    partnerHeight: String,
-    partnerEducation: String,
-    partnerOccupation: String,
-    partnerLocation: String,
-    partnerIncome: String,
-
-    // About Yourself
-    aboutYourself: String
+    aboutYourself: String,
+    motherTongue: String,
+    subCommunity: String,
+    familyType: String,
+    familyStatus: String,
+    familyValues: String,
+    fatherOccupation: String,
+    motherOccupation: String,
+    brothers: Number,
+    sisters: Number,
+    familyContact: String,
+    fitnessLevel: String
 }, { timestamps: true });
 
-module.exports = mongoose.model("Profile", profileSchema);
+module.exports = mongoose.model('UserProfile', profileSchema);

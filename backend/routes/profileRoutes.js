@@ -1,12 +1,9 @@
-const express = require("express");
-const { saveProfile, getProfile } = require("../controllers/profileController");
+const express = require('express');
+const { getUserProfile, saveUserProfile } = require('../controllers/profileController');
 
 const router = express.Router();
 
-// Save or update profile
-router.post("/save", saveProfile);
-
-// Get profile by email
-router.get("/:email", getProfile);
+router.get('/getUser/:email', getUserProfile);
+router.post('/save', saveUserProfile);
 
 module.exports = router;
