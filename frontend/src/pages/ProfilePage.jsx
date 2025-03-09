@@ -68,39 +68,47 @@ const ProfileSystem = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-        try {
-            const storedUser = JSON.parse(localStorage.getItem("user"));
-            if (!storedUser || !storedUser.email) {
-                console.error("No user found in localStorage");
-                return;
-            }
-            const userEmail = storedUser.email;
-
-            const response = await fetch(`http://localhost:5000/api/profile/getUser/${userEmail}`);
-            const data = await response.json();
-
-            if (response.ok) {
-                // Convert dateOfBirth to a string in YYYY-MM-DD format for the input field
-                if (data.dateOfBirth) {
-                    data.dateOfBirth = new Date(data.dateOfBirth).toISOString().split('T')[0];
-                }
-                setFormData(prev => ({
-                    ...prev,
-                    ...data  // Spread all fetched data into state
-                }));
-            } else {
-                console.error("Error fetching user details:", data.error);
-            }
-        } catch (error) {
-            console.error("Error fetching profile:", error);
+      try {
+        // Retrieve the user data from localStorage
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (!storedUser || !storedUser.email) {
+          console.error("No user found in localStorage");
+          return;
         }
+
+        // Pre-fill email & phone from localStorage immediately
+        setFormData(prev => ({
+          ...prev,
+          email: storedUser.email,
+          phone: storedUser.phone || "",
+        }));
+
+        // Encode the email to safely include it in the URL
+        const encodedEmail = encodeURIComponent(storedUser.email);
+
+        // Call the API from the users collection to fetch additional details
+        const response = await fetch(`http://localhost:5000/api/users/getuser/${encodedEmail}`);
+        if (!response.ok) {
+          console.error(`Error fetching user details: ${response.status} ${response.statusText}`);
+          return;
+        }
+        const data = await response.json();
+
+        // Merge the API response with the localStorage data,
+        // ensuring the stored email and phone are not overwritten.
+        setFormData(prev => ({
+          ...prev,
+          ...data,
+          email: storedUser.email,           // Always use stored email
+          phone: storedUser.phone || data.phone || "",  // Prioritize stored phone if available
+        }));
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
     };
 
     fetchUserData();
-}, []);
-
-
-
+  }, []);
 
 
   const handleInputChange = (e) => {

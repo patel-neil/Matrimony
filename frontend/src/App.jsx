@@ -17,10 +17,12 @@ function App() {
   useEffect(() => {
     if (user) {
       const userData = {
-        email: user.primaryEmailAddress?.emailAddress,
+        email: user.primaryEmailAddress?.emailAddress || "",
+        phone: user.primaryPhoneNumber?.phoneNumber || "",
         id: user.id
       };
 
+      console.log("Storing user in localStorage:", userData); // ✅ Debugging log
       localStorage.setItem("user", JSON.stringify(userData)); // Store user details
     }
   }, [user]); // Runs when `user` changes
