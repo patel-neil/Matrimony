@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Document = require("../models/Document"); // Ensure this is correctly pointing to your model
 
 // Save user details after Clerk authentication
 const saveUser = async (req, res) => {
@@ -32,14 +33,31 @@ const getUserByEmail = async (req, res) => {
   try {
     const { email } = req.params;
 
-    // Fetch only email and phoneNumber fields
+    // Fetch only email and phoneNumber fields from User
     const user = await User.findOne({ email }, "email phoneNumber");
-
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+    
+    // Fetch user's documents from the Document collection
+    const documents = await Document.find({ userEmail: email }, "docType fileName _id");
 
-    res.status(200).json({ userId: user._id, email: user.email, phoneNumber: user.phoneNumber });
+    // Map documents to include the file URL. Ensure the URL format matches the one you generated.
+    const docsWithUrl = documents.map(doc => {
+      const fileUrl = `${req.protocol}://${req.get('host')}/api/documents/get/${doc._id}`;
+      return {
+        docType: doc.docType,
+        fileName: doc.fileName,
+        fileUrl,
+      };
+    });
+
+    res.status(200).json({ 
+      userId: user._id, 
+      email: user.email, 
+      phoneNumber: user.phoneNumber,
+      documents: docsWithUrl, // Include the document details
+    });
   } catch (error) {
     console.error("Error fetching user:", error);
     res.status(500).json({ error: "Internal Server Error" });

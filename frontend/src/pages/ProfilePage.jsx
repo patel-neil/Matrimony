@@ -100,7 +100,7 @@ const ProfileSystem = () => {
         // Encode the email to safely include it in the URL
         const encodedEmail = encodeURIComponent(storedUser.email);
   
-        // Call the API to fetch additional details
+        // Call the API to fetch additional details, including document data
         const response = await fetch(`http://localhost:5000/api/users/getuser/${encodedEmail}`);
         if (!response.ok) {
           console.error(`Error fetching user details: ${response.status} ${response.statusText}`);
@@ -109,12 +109,23 @@ const ProfileSystem = () => {
   
         const data = await response.json();
   
-        // Merge the API response with the localStorage data
+        // If the API returns a documents array, map it to expected keys
+        let docData = {};
+        if (data.documents && Array.isArray(data.documents)) {
+          data.documents.forEach(doc => {
+            // Map based on the docType returned from the API
+            // For example, if doc.docType is "aadharCard", we set that key in state.
+            docData[doc.docType] = { name: doc.fileName, url: doc.fileUrl };
+          });
+        }
+  
+        // Merge API response, document mapping, and local storage data into formData
         setFormData(prev => ({
           ...prev,
-          ...data, // This will only merge non-document user details
+          ...data,            // Contains other user details (and possibly a documents array)
+          ...docData,         // This adds keys like aadharCard, educationCertificate, etc.
           email: storedUser.email,  // Always use stored email
-          phone: storedUser.phone || data.phone || "",
+          phone: storedUser.phone || data.phoneNumber || "",
         }));
       } catch (error) {
         console.error("Error fetching user details:", error);
@@ -123,6 +134,8 @@ const ProfileSystem = () => {
   
     fetchUserData();
   }, []);
+  
+  
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -146,33 +159,30 @@ const ProfileSystem = () => {
     }
   };
 
-  // Update handleDocumentUpload to use correct parameter order and formData.email
-// Updated handleDocumentUpload function
-// Update handleDocumentUpload to use correct parameter order and formData.email
 const handleDocumentUpload = async (docType, file) => {
   if (!file) {
     alert("Please select a file to upload.");
     return;
   }
-  // Create a new FormData instance for the file upload
   const uploadData = new FormData();
-  uploadData.append("userEmail", formData.email); // Using formData.email from your state
+  uploadData.append("userEmail", formData.email);
   uploadData.append("docType", docType);
   uploadData.append("file", file);
 
   try {
     const response = await fetch("http://localhost:5000/api/documents/upload", {
       method: "POST",
-      body: uploadData, // No need to set Content-Type header; browser does it for multipart/form-data
+      body: uploadData,
     });
     const data = await response.json();
     if (response.ok) {
       alert("Document uploaded successfully!");
       console.log("Uploaded document:", data);
-      // Optionally update formData state so the UI shows the file as "Uploaded"
+      // Update the state with an object containing the file's name and URL.
+      // Ensure your backend returns a "fileUrl" property.
       setFormData(prev => ({
         ...prev,
-        [docType]: file,
+        [docType]: { name: file.name, url: data.fileUrl },
       }));
     } else {
       alert(`Upload failed: ${data.message}`);
@@ -182,6 +192,7 @@ const handleDocumentUpload = async (docType, file) => {
     alert("Error uploading document. Please try again.");
   }
 };
+
 
 
 
