@@ -11,6 +11,8 @@ const adminRoutes = require("./routes/adminRoutes");
 const preferenceRoutes = require("./routes/preferenceRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
+const documentRoutes = require('./routes/documentRoutes');
+
 
 // Initialize Express App
 const app = express();
@@ -51,6 +53,7 @@ app.use("/api/admin", adminRoutes); // Admin-related routes
 app.use("/api/preferences", preferenceRoutes); // Preference-related routes
 app.use("/api/profile", profileRoutes); // Profile-related routes
 app.use("/api", uploadRoutes); // File upload routes
+app.use('/api/documents', documentRoutes);
 
 // Health Check Endpoint
 app.get("/api/health", (req, res) => {

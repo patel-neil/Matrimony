@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Upload, Camera, MapPin, Book, Briefcase, Heart, Lock, CheckCircle, Share2, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getUserProfile, saveProfile } from "../assets/api";
+
 const ProfileSystem = () => {
   const [step, setStep] = useState(1);
   const [profileImage, setProfileImage] = useState(null);
@@ -61,8 +62,21 @@ const ProfileSystem = () => {
     educationCertificate: null,
     incomeCertificate: null,
     aboutYourself: ""
-});
+  });
 
+  // New state to track verification status for each document
+  const [docVerified, setDocVerified] = useState({
+    aadharCard: false,
+    educationCertificate: false,
+    incomeCertificate: false,
+  });
+
+  // Define the documents array once to use in both upload and status sections
+  const documents = [
+    { key: 'aadharCard', label: 'Aadhar Card', required: true },
+    { key: 'educationCertificate', label: 'Education Certificate', required: true },
+    { key: 'incomeCertificate', label: 'Income Certificate', required: false }
+  ];
 
   const TOTAL_STEPS = 10;
 
@@ -75,50 +89,48 @@ const ProfileSystem = () => {
           console.error("No user found in localStorage");
           return;
         }
-
+  
         // Pre-fill email & phone from localStorage immediately
         setFormData(prev => ({
           ...prev,
           email: storedUser.email,
           phone: storedUser.phone || "",
         }));
-
+  
         // Encode the email to safely include it in the URL
         const encodedEmail = encodeURIComponent(storedUser.email);
-
-        // Call the API from the users collection to fetch additional details
+  
+        // Call the API to fetch additional details
         const response = await fetch(`http://localhost:5000/api/users/getuser/${encodedEmail}`);
         if (!response.ok) {
           console.error(`Error fetching user details: ${response.status} ${response.statusText}`);
           return;
         }
+  
         const data = await response.json();
-
-        // Merge the API response with the localStorage data,
-        // ensuring the stored email and phone are not overwritten.
+  
+        // Merge the API response with the localStorage data
         setFormData(prev => ({
           ...prev,
-          ...data,
-          email: storedUser.email,           // Always use stored email
-          phone: storedUser.phone || data.phone || "",  // Prioritize stored phone if available
+          ...data, // This will only merge non-document user details
+          email: storedUser.email,  // Always use stored email
+          phone: storedUser.phone || data.phone || "",
         }));
       } catch (error) {
         console.error("Error fetching user details:", error);
       }
     };
-
+  
     fetchUserData();
   }, []);
-
-
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
     if (name === "email" || name === "phone") return; // Prevent email/phone changes
 
     setFormData(prev => ({
-        ...prev,
-        [name]: value || "" // Ensure no undefined values
+      ...prev,
+      [name]: value || "" // Ensure no undefined values
     }));
   };
 
@@ -134,12 +146,44 @@ const ProfileSystem = () => {
     }
   };
 
-  const handleDocumentUpload = (type, file) => {
-    setFormData(prev => ({
-      ...prev,
-      [type]: file
-    }));
-  };
+  // Update handleDocumentUpload to use correct parameter order and formData.email
+// Updated handleDocumentUpload function
+// Update handleDocumentUpload to use correct parameter order and formData.email
+const handleDocumentUpload = async (docType, file) => {
+  if (!file) {
+    alert("Please select a file to upload.");
+    return;
+  }
+  // Create a new FormData instance for the file upload
+  const uploadData = new FormData();
+  uploadData.append("userEmail", formData.email); // Using formData.email from your state
+  uploadData.append("docType", docType);
+  uploadData.append("file", file);
+
+  try {
+    const response = await fetch("http://localhost:5000/api/documents/upload", {
+      method: "POST",
+      body: uploadData, // No need to set Content-Type header; browser does it for multipart/form-data
+    });
+    const data = await response.json();
+    if (response.ok) {
+      alert("Document uploaded successfully!");
+      console.log("Uploaded document:", data);
+      // Optionally update formData state so the UI shows the file as "Uploaded"
+      setFormData(prev => ({
+        ...prev,
+        [docType]: file,
+      }));
+    } else {
+      alert(`Upload failed: ${data.message}`);
+    }
+  } catch (error) {
+    console.error("Error uploading document:", error);
+    alert("Error uploading document. Please try again.");
+  }
+};
+
+
 
   const handleHobbiesChange = (hobby) => {
     setFormData(prev => ({
@@ -188,45 +232,41 @@ const ProfileSystem = () => {
       </div>
     </div>
   );
-  
+
   const handleProfileSave = async () => {
     try {
-        const storedUser = JSON.parse(localStorage.getItem("user"));
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      if (!storedUser || !storedUser.email) {
+        console.error("User not found in localStorage");
+        return;
+      }
 
-        if (!storedUser || !storedUser.email) {
-            console.error("User not found in localStorage");
-            return;
-        }
+      const updatedFormData = {
+        ...formData,
+        email: storedUser.email,
+        phone: storedUser.phone || formData.phone
+      };
 
-        const updatedFormData = {
-            ...formData,
-            email: storedUser.email, 
-            phone: storedUser.phone || formData.phone
-        };
+      const response = await fetch("http://localhost:5000/api/profile/save", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json" 
+        },
+        body: JSON.stringify(updatedFormData),
+      });
 
-        const response = await fetch("http://localhost:5000/api/profile/save", {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json" 
-            },
-            body: JSON.stringify(updatedFormData),
-        });
+      const data = await response.json();
 
-        const data = await response.json();
-
-        if (response.ok) {
-            alert("Profile saved successfully!");
-        } else {
-            console.error("Error saving profile:", data.message);
-            alert(`Error: ${data.message}`);
-        }
+      if (response.ok) {
+        alert("Profile saved successfully!");
+      } else {
+        console.error("Error saving profile:", data.message);
+        alert(`Error: ${data.message}`);
+      }
     } catch (error) {
-        console.error("Error:", error);
+      console.error("Error:", error);
     }
-};
-
-
-
+  };
 
   const renderBasicInfo = () => (
     <div className="space-y-6">
@@ -291,12 +331,11 @@ const ProfileSystem = () => {
       </div>
     </div>
   );
-  
+
   const renderPhysicalInformation = () => (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold">Physical Information</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
         {/* Height */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -525,7 +564,6 @@ const ProfileSystem = () => {
       </div>
     </div>
   );
-  
 
   const renderReligionCommunity = () => (
     <div className="space-y-6">
@@ -615,45 +653,77 @@ const ProfileSystem = () => {
     </div>
   );
 
+  // Updated Document Verification section with upload buttons, verification display, and a submit button
   const renderVerification = () => (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold">Document Verification</h2>
       
       <div className="space-y-4">
-        {[
-          { key: 'aadharCard', label: 'Aadhar Card', required: true },
-          { key: 'educationCertificate', label: 'Education Certificate', required: true },
-          { key: 'incomeCertificate', label: 'Income Certificate', required: false }
-        ].map(({ key, label, required }) => (
-          <div key={key} className="border rounded-lg p-4">
+        {documents.map(doc => (
+          <div key={doc.key} className="border rounded-lg p-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {label} {required && '*'}
+              {doc.label} {doc.required && '*'}
             </label>
             <div className="flex items-center space-x-4">
               <input
                 type="file"
-                onChange={(e) => handleDocumentUpload(key, e.target.files[0])}
+                onChange={(e) => handleDocumentUpload(doc.key, e.target.files[0])}
                 className="hidden"
-                id={`file-${key}`}
+                id={`file-${doc.key}`}
                 accept=".pdf,.jpg,.jpeg,.png"
               />
               <label
-                htmlFor={`file-${key}`}
+                htmlFor={`file-${doc.key}`}
                 className="flex items-center justify-center w-full p-4 border-2 border-dashed rounded-md cursor-pointer hover:border-blue-500"
               >
                 <div className="text-center">
                   <Upload className="mx-auto h-8 w-8 text-gray-400" />
                   <span className="mt-2 block text-sm text-gray-600">
-                    {formData[key] ? formData[key].name : 'Click to upload'}
+                    {formData[doc.key] ? formData[doc.key].name : 'Click to upload'}
                   </span>
                 </div>
               </label>
             </div>
+            {docVerified[doc.key] && (
+              <div className="mt-2 text-green-600 font-semibold">
+                Verified
+              </div>
+            )}
           </div>
         ))}
       </div>
+      <button
+        onClick={handleDocumentVerification}
+        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+      >
+        Submit Documents for Verification
+      </button>
     </div>
   );
+
+  // Function to handle document verification submission
+  const handleDocumentVerification = () => {
+    // Check required documents are uploaded
+    const missingRequired = documents.filter(doc => doc.required && !formData[doc.key]);
+    if (missingRequired.length > 0) {
+      alert("Please upload all required documents before submitting for verification.");
+      return;
+    }
+    // Mark each uploaded document as verified
+    const updatedVerification = { ...docVerified };
+    documents.forEach(doc => {
+      if (formData[doc.key]) {
+        updatedVerification[doc.key] = true;
+      }
+    });
+    setDocVerified(updatedVerification);
+    // If all required documents are verified, update overall status
+    const allRequiredVerified = documents.filter(doc => doc.required).every(doc => updatedVerification[doc.key]);
+    if (allRequiredVerified) {
+      setVerificationStatus('verified');
+    }
+    alert("Documents submitted for verification.");
+  };
 
   const renderLocation = () => (
     <div className="space-y-6">
@@ -717,9 +787,8 @@ const ProfileSystem = () => {
       </div>
     </div>
   );
-//
 
-const renderBasicDetails = () => (
+  const renderBasicDetails = () => (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold">Basic Details</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -798,9 +867,7 @@ const renderBasicDetails = () => (
       </div>
     </div>
   );
-  
 
-//
   const renderEducationCareer = () => (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold">Education & Career</h2>
@@ -865,7 +932,6 @@ const renderBasicDetails = () => (
             required
           />
         </div>
-         
          
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -964,6 +1030,7 @@ const renderBasicDetails = () => (
       </div>
     </div>
   );
+
   const renderFamilyDetails = () => (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold">Family Details</h2>
@@ -1082,7 +1149,6 @@ const renderBasicDetails = () => (
       </div>
     </div>
   );
-  
 
   const renderAboutYourself = () => (
     <div className="space-y-6">
@@ -1115,24 +1181,20 @@ const renderBasicDetails = () => (
         return renderBasicDetails();
       case 3:
         return renderLocation();
-        
       case 4:
         return renderReligionCommunity();
-       
       case 5:
-
         return renderEducationCareer();
       case 6:
         return renderLifestyleInterests();
       case 7:
         return renderHoroscope();
-        case 8:
+      case 8:
         return renderPhysicalInformation();
-
-        case 9:
+      case 9:
         return renderFamilyDetails();
-        case 10:
-            return  renderAboutYourself();
+      case 10:
+        return renderAboutYourself();
       default:
         return null;
     }
@@ -1155,30 +1217,29 @@ const renderBasicDetails = () => (
   const submitProfile = async () => {
     setLoading(true);
     try {
-        console.log("Submitting profile:", formData); // Debugging
+      console.log("Submitting profile:", formData); // Debugging
 
-        const response = await fetch("http://localhost:5000/api/profile/save", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData),
-        });
+      const response = await fetch("http://localhost:5000/api/profile/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (response.ok) {
-            alert("Profile submitted successfully!");
-            Navigate('/');  // Redirect to home page after submission
-        } else {
-            console.error("Error submitting profile:", data.message);
-            alert(`Error: ${data.message}`);
-        }
+      if (response.ok) {
+        alert("Profile submitted successfully!");
+        Navigate('/');  // Redirect to home page after submission
+      } else {
+        console.error("Error submitting profile:", data.message);
+        alert(`Error: ${data.message}`);
+      }
     } catch (error) {
-        console.error("Error:", error);
+      console.error("Error:", error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
-
+  };
 
   const calculateProgress = () => {
     return Math.round((step / TOTAL_STEPS) * 100);
@@ -1190,48 +1251,46 @@ const renderBasicDetails = () => (
     const instagramRegex = /^https?:\/\/(www\.)?instagram\.com\/.*$/;
 
     if (formData.linkedin && !linkedinRegex.test(formData.linkedin)) {
-        alert("Invalid LinkedIn URL. Please enter a valid LinkedIn profile link.");
-        return;
+      alert("Invalid LinkedIn URL. Please enter a valid LinkedIn profile link.");
+      return;
     }
 
     if (formData.instagram && !instagramRegex.test(formData.instagram)) {
-        alert("Invalid Instagram URL. Please enter a valid Instagram profile link.");
-        return;
+      alert("Invalid Instagram URL. Please enter a valid Instagram profile link.");
+      return;
     }
 
     try {
-        const storedUser = JSON.parse(localStorage.getItem("user"));
-        if (!storedUser || !storedUser.email) {
-            console.error("User not found in localStorage");
-            return;
-        }
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      if (!storedUser || !storedUser.email) {
+        console.error("User not found in localStorage");
+        return;
+      }
 
-        const updatedData = {
-            email: storedUser.email,
-            linkedin: formData.linkedin,
-            instagram: formData.instagram
-        };
+      const updatedData = {
+        email: storedUser.email,
+        linkedin: formData.linkedin,
+        instagram: formData.instagram
+      };
 
-        const response = await fetch("http://localhost:5000/api/profile/save", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updatedData),
-        });
+      const response = await fetch("http://localhost:5000/api/profile/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (response.ok) {
-            alert("Social media links saved successfully!");
-        } else {
-            console.error("Error saving social media links:", data.message);
-            alert(`Error: ${data.message}`);
-        }
+      if (response.ok) {
+        alert("Social media links saved successfully!");
+      } else {
+        console.error("Error saving social media links:", data.message);
+        alert(`Error: ${data.message}`);
+      }
     } catch (error) {
-        console.error("Error:", error);
+      console.error("Error:", error);
     }
-};
-
-
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -1313,13 +1372,16 @@ const renderBasicDetails = () => (
                 </span>
               </div>
 
-              {/* Document Verification Status */}
+              {/* Updated Document Verification Status */}
+              {/* Updated Document Verification Status */}
               <div className="space-y-2">
-                {['Aadhar Card', 'Education Certificate', 'Income Certificate'].map((doc) => (
-                  <div key={doc} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                    <span className="text-sm">{doc}</span>
+                {documents.map(doc => (
+                  <div key={doc.key} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                    <span className="text-sm">{doc.label}</span>
                     <span className="text-sm text-gray-500">
-                      {formData[doc.toLowerCase().replace(/ /g, '')] ? 'Uploaded' : 'Pending'}
+                      {docVerified[doc.key] || formData[doc.key]
+                        ? 'Uploaded'
+                        : 'Pending'}
                     </span>
                   </div>
                 ))}
@@ -1328,8 +1390,7 @@ const renderBasicDetails = () => (
           </div>
         )}
 
-
-       {/* Social Media Links */}
+        {/* Social Media Links */}
         <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
           <div className="flex items-center space-x-3 mb-4">
             <Share2 className="w-6 h-6 text-gray-600" />
@@ -1375,6 +1436,10 @@ const renderBasicDetails = () => (
           </div>
         </div>
 
+        {/* Document Verification Section */}
+        <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
+          {renderVerification()}
+        </div>
 
         {/* Auto-save Indicator */}
         {autoSaveTimer && (
@@ -1387,6 +1452,5 @@ const renderBasicDetails = () => (
     </div>
   );
 };
-
 
 export default ProfileSystem;
