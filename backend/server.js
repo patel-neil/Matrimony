@@ -12,7 +12,8 @@ const adminDocumentRoutes = require("./routes/adminDocumentRoutes");
 const preferenceRoutes = require("./routes/preferenceRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
-const documentRoutes = require("./routes/documentRoutes");
+const documentRoutes = require('./routes/documentRoutes');
+
 
 const app = express();
 
@@ -44,15 +45,13 @@ connectDB()
   });
 
 // API Routes
-app.use("/api/users", userRoutes);
-app.use("/api/chats", chatRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api/admin-documents", adminDocumentRoutes);
-app.use("/api/preferences", preferenceRoutes);
-app.use("/api/profile", profileRoutes);
-app.use("/api", uploadRoutes);
-app.use("/api/documents", documentRoutes);
-app.use("/uploads", express.static("uploads"));
+app.use("/api/users", userRoutes); // User-related routes
+app.use("/api/chats", chatRoutes); // Chat-related routes
+app.use("/api/admin", adminRoutes); // Admin-related routes
+app.use("/api/preferences", preferenceRoutes); // Preference-related routes
+app.use("/api/profile", profileRoutes); // Profile-related routes
+app.use("/api", uploadRoutes); // File upload routes
+app.use('/api/documents', documentRoutes);
 
 // Health Check
 app.get("/api/health", (req, res) => {
