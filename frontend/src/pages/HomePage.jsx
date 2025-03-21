@@ -48,7 +48,6 @@ const HomePage = () => {
             <a href="/" className="text-gray-600 hover:text-rose-600">Home</a>
             <a href="/search" className="text-gray-600 hover:text-rose-600">Search</a>
             <a href="/matches" className="text-gray-600 hover:text-rose-600">Matches</a>
-            <a href="/notifications" className="text-gray-600 hover:text-rose-600">Chat</a>
             <a href="/profile" className="text-gray-600 hover:text-rose-600">Profile</a>
             <a href="/partner-preference" className="text-gray-600 hover:text-rose-600">Preference</a>
 
@@ -66,8 +65,8 @@ const HomePage = () => {
             
             {isSignedIn ? (
               <>
-                <Bell className="h-5 w-5 text-gray-600 cursor-pointer hover:text-rose-600" />
-                <Heart className="h-5 w-5 text-gray-600 cursor-pointer hover:text-rose-600" />
+                {/* <Bell className="h-5 w-5 text-gray-600 cursor-pointer hover:text-rose-600" />
+                <Heart className="h-5 w-5 text-gray-600 cursor-pointer hover:text-rose-600" /> */}
                 <UserButton afterSignOutUrl="/" />
               </>
             ) : (
@@ -93,32 +92,19 @@ const HomePage = () => {
           </p>
           
           {/* Search Form */}
-          <div className="mt-10 max-w-xl mx-auto">
-            <div className="flex shadow-lg rounded-lg overflow-hidden">
-              <input
-                type="text"
-                placeholder="Search by location, community, or profession..."
-                className="flex-1 px-6 py-4 focus:outline-none"
-              />
-              <button className="bg-rose-600 px-6 py-4 text-white hover:bg-rose-700 flex items-center">
-                <Search className="h-5 w-5 mr-2" />
-                Search
-              </button>
-            </div>
-          </div>
-
+          
           {/* Quick Stats */}
           <div className="mt-20 grid grid-cols-1 gap-8 sm:grid-cols-3">
             <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="text-3xl font-bold text-rose-600">10M+</div>
+              <div className="text-3xl font-bold text-rose-600">10+</div>
               <div className="text-gray-600">Active Members</div>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="text-3xl font-bold text-rose-600">1M+</div>
+              <div className="text-3xl font-bold text-rose-600">1+</div>
               <div className="text-gray-600">Success Stories</div>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="text-3xl font-bold text-rose-600">150+</div>
+              <div className="text-3xl font-bold text-rose-600">15+</div>
               <div className="text-gray-600">Countries</div>
             </div>
           </div>

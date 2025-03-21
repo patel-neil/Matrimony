@@ -6,6 +6,11 @@ const DocumentSchema = new mongoose.Schema({
   fileName: { type: String, required: true },
   contentType: { type: String, required: true },
   data: { type: Buffer, required: true },
+  status: { 
+    type: String, 
+    enum: ['pending', 'approved', 'rejected'], 
+    default: 'pending' 
+  },
   uploadedAt: { type: Date, default: Date.now },
 });
 

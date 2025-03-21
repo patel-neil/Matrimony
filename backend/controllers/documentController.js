@@ -45,22 +45,31 @@ exports.uploadDocument = async (req, res) => {
 exports.getDocument = async (req, res) => {
   try {
     const { id } = req.params;
-
-    // Find the document by ID in the database
     const document = await Document.findById(id);
-
     if (!document) {
       return res.status(404).json({ message: "Document not found" });
     }
-
-    // Set appropriate headers for the response
     res.set("Content-Type", document.contentType);
     res.set("Content-Disposition", `inline; filename="${document.fileName}"`);
-
-    // Send the file data
     res.send(document.data);
   } catch (error) {
-    console.error("❌ Error fetching document:", error);
     res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
+exports.getUserDocuments = async (req, res) => {
+  try {
+    const userEmail = req.params.email;
+    const documents = await Document.find({ userEmail }).select("fileName fileUrl status docType");
+
+    if (!documents || documents.length === 0) {
+      return res.status(404).json({ message: "No documents found for this user." });
+    }
+
+    res.status(200).json(documents);
+  } catch (error) {
+    console.error("Error fetching user documents:", error);
+    res.status(500).json({ message: "Error retrieving documents" });
   }
 };

@@ -19,10 +19,12 @@ const adminLogin = async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // Generate JWT Token
-    const token = jwt.sign({ id: admin._id, email: admin.email }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
+    // Generate JWT Token with role property
+    const token = jwt.sign(
+      { id: admin._id, email: admin.email, role: "admin" },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
 
     res.status(200).json({ token, message: "Login successful" });
   } catch (error) {
@@ -46,4 +48,5 @@ const getAdminDashboard = async (req, res) => {
     res.status(500).json({ message: "Server error. Please try again later." });
   }
 };
+
 module.exports = { adminLogin, getAdminDashboard };

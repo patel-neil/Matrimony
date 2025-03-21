@@ -9,6 +9,8 @@ const ProfileSystem = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [autoSaveTimer, setAutoSaveTimer] = useState(null);
   const [verificationStatus, setVerificationStatus] = useState('pending');
+  const [document, setDocument] = useState([]);
+  
   const [loading, setLoading] = useState(false);
   const Navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -109,21 +111,37 @@ const ProfileSystem = () => {
   
         const data = await response.json();
   
-        // If the API returns a documents array, map it to expected keys
+        // Debugging: Ensure API response contains expected fields
+        console.log("Fetched user details:", data);
+  
+        // Initialize docData object
         let docData = {};
-        if (data.documents && Array.isArray(data.documents)) {
-          data.documents.forEach(doc => {
-            // Map based on the docType returned from the API
-            // For example, if doc.docType is "aadharCard", we set that key in state.
-            docData[doc.docType] = { name: doc.fileName, url: doc.fileUrl };
+  
+        // Fetch document statuses from the documents API
+        const docResponse = await fetch(`http://localhost:5000/api/documents/user-documents/${encodedEmail}`);
+        if (docResponse.ok) {
+          const docDataArray = await docResponse.json();
+  
+          // Debugging: Ensure document API response contains expected fields
+          console.log("Fetched document details:", docDataArray);
+  
+          // Map the documents array into an object keyed by docType
+          docDataArray.forEach(doc => {
+            docData[doc.docType] = { 
+              name: doc.fileName, 
+              url: doc.fileUrl || "", // Ensure there's a URL or set it empty
+              status: doc.status // "pending", "approved", or "rejected"
+            };
           });
+        } else {
+          console.warn("No document data found for user.");
         }
   
         // Merge API response, document mapping, and local storage data into formData
         setFormData(prev => ({
           ...prev,
           ...data,            // Contains other user details (and possibly a documents array)
-          ...docData,         // This adds keys like aadharCard, educationCertificate, etc.
+          ...docData,         // Adds keys like aadharCard, educationCertificate, etc.
           email: storedUser.email,  // Always use stored email
           phone: storedUser.phone || data.phoneNumber || "",
         }));
@@ -134,6 +152,22 @@ const ProfileSystem = () => {
   
     fetchUserData();
   }, []);
+  
+  
+  
+  const fetchUserDocuments = async () => {
+    try {
+      console.log("Fetching documents for:", userEmail); // Debugging
+      const response = await axios.get(`http://localhost:5000/api/documents/user-documents/${userEmail}`);
+      console.log("Fetched documents:", response.data); // Debugging
+
+      setDocuments(response.data);
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   
   
   
@@ -167,6 +201,7 @@ const handleDocumentUpload = async (docType, file) => {
   const uploadData = new FormData();
   uploadData.append("userEmail", formData.email);
   uploadData.append("docType", docType);
+  console.log("File to upload:", file);
   uploadData.append("file", file);
 
   try {
@@ -666,51 +701,56 @@ const handleDocumentUpload = async (docType, file) => {
 
   // Updated Document Verification section with upload buttons, verification display, and a submit button
   const renderVerification = () => (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold">Document Verification</h2>
-      
-      <div className="space-y-4">
-        {documents.map(doc => (
-          <div key={doc.key} className="border rounded-lg p-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {doc.label} {doc.required && '*'}
-            </label>
-            <div className="flex items-center space-x-4">
-              <input
-                type="file"
-                onChange={(e) => handleDocumentUpload(doc.key, e.target.files[0])}
-                className="hidden"
-                id={`file-${doc.key}`}
-                accept=".pdf,.jpg,.jpeg,.png"
-              />
-              <label
-                htmlFor={`file-${doc.key}`}
-                className="flex items-center justify-center w-full p-4 border-2 border-dashed rounded-md cursor-pointer hover:border-blue-500"
-              >
-                <div className="text-center">
-                  <Upload className="mx-auto h-8 w-8 text-gray-400" />
-                  <span className="mt-2 block text-sm text-gray-600">
-                    {formData[doc.key] ? formData[doc.key].name : 'Click to upload'}
-                  </span>
-                </div>
-              </label>
-            </div>
-            {docVerified[doc.key] && (
-              <div className="mt-2 text-green-600 font-semibold">
-                Verified
+  <div className="space-y-6">
+    <h2 className="text-xl font-semibold">Document Verification</h2>
+    
+    <div className="space-y-4">
+      {documents.map(doc => (
+        <div key={doc.key} className="border rounded-lg p-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {doc.label} {doc.required && '*'}
+          </label>
+          <div className="flex items-center space-x-4">
+            <input
+              type="file"
+              onChange={(e) => handleDocumentUpload(doc.key, e.target.files[0])}
+              className="hidden"
+              id={`file-${doc.key}`}
+              accept=".pdf,.jpg,.jpeg,.png"
+            />
+            <label
+              htmlFor={`file-${doc.key}`}
+              className="flex items-center justify-center w-full p-4 border-2 border-dashed rounded-md cursor-pointer hover:border-blue-500"
+            >
+              <div className="text-center">
+                <Upload className="mx-auto h-8 w-8 text-gray-400" />
+                <span className="mt-2 block text-sm text-gray-600">
+                  {formData[doc.key] ? formData[doc.key].name : 'Click to upload'}
+                </span>
               </div>
-            )}
+            </label>
           </div>
-        ))}
-      </div>
-      <button
-        onClick={handleDocumentVerification}
-        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-      >
-        Submit Documents for Verification
-      </button>
+          
+          {/* Display "Uploaded" after user selects a file, instead of "Verified" */}
+          {formData[doc.key] && (
+            <div className="mt-2 text-gray-600 font-semibold">
+              Uploaded
+            </div>
+          )}
+          
+        </div>
+      ))}
     </div>
-  );
+    
+    <button
+      onClick={handleDocumentVerification}
+      className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+    >
+      Submit Documents for Verification
+    </button>
+  </div>
+);
+
 
   // Function to handle document verification submission
   const handleDocumentVerification = () => {
@@ -1374,24 +1414,21 @@ const handleDocumentUpload = async (docType, file) => {
                      'Verification required'}
                   </p>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-sm ${
-                  verificationStatus === 'verified' ? 'bg-green-100 text-green-800' :
-                  verificationStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
-                  {verificationStatus.charAt(0).toUpperCase() + verificationStatus.slice(1)}
-                </span>
+                
               </div>
 
-              {/* Updated Document Verification Status */}
               {/* Updated Document Verification Status */}
               <div className="space-y-2">
                 {documents.map(doc => (
                   <div key={doc.key} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
                     <span className="text-sm">{doc.label}</span>
                     <span className="text-sm text-gray-500">
-                      {docVerified[doc.key] || formData[doc.key]
-                        ? 'Uploaded'
+                      {formData[doc.key]
+                        ? formData[doc.key].status === 'approved'
+                          ? 'Verified'
+                          : formData[doc.key].status === 'rejected'
+                            ? 'Rejected'
+                            : 'Uploaded'
                         : 'Pending'}
                     </span>
                   </div>
