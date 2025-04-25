@@ -13,10 +13,7 @@ const preferenceRoutes = require("./routes/preferenceRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 const documentRoutes = require("./routes/documentRoutes");
-
-// Import dummy profile controllers (from friend's code)
-const matchesController = require("./controllers/matches"); // For search page profiles
-const preferenceFilterController = require("./controllers/preferenceFilter"); // For filtering matches
+const searchRoutes = require('./routes/searchRoutes');
 
 const app = express();
 
@@ -56,12 +53,7 @@ app.use("/api/preferences", preferenceRoutes); // Preference-related routes
 app.use("/api/profile", profileRoutes); // Profile-related routes
 app.use("/api", uploadRoutes); // File upload routes
 app.use("/api/documents", documentRoutes); // Document-related routes
-
-// Dummy Profiles Route (for search page) - From friend's code
-app.get("/api/profiles", matchesController);
-
-// Dummy Preference Match Route (for filtering based on candidate preference) - From friend's code
-app.get("/api/preference-match", preferenceFilterController);
+app.use('/api/search', searchRoutes); // Search-related routes
 
 // Health Check Endpoint
 app.get("/api/health", (req, res) => {
