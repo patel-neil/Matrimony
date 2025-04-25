@@ -12,7 +12,7 @@ const profiles = [
     weight: 55,
     annualIncome: 60000,
     phone: "1234567890",
-    email: "priya@example.com",
+    email: "priyashah@example.com",
     maritalStatus: "Single",
     education: "B.Tech in Computer Science",
     hobbies: "Reading, Travelling"
@@ -29,7 +29,7 @@ const profiles = [
     weight: 70,
     annualIncome: 80000,
     phone: "2345678901",
-    email: "rahul@example.com",
+    email: "rahulpatel@example.com",
     maritalStatus: "Married",
     education: "MBBS",
     hobbies: "Cycling, Music"
@@ -46,7 +46,7 @@ const profiles = [
     weight: 50,
     annualIncome: 50000,
     phone: "3456789012",
-    email: "aisha@example.com",
+    email: "aishakhan@example.com",
     maritalStatus: "Single",
     education: "BA in English",
     hobbies: "Dancing, Painting"
@@ -63,7 +63,7 @@ const profiles = [
     weight: 80,
     annualIncome: 120000,
     phone: "4567890123",
-    email: "sanjay@example.com",
+    email: "sanjayverma@example.com",
     maritalStatus: "Married",
     education: "MBA",
     hobbies: "Golf, Travelling"
@@ -80,27 +80,10 @@ const profiles = [
     weight: 52,
     annualIncome: 70000,
     phone: "5678901234",
-    email: "neha@example.com",
+    email: "nehagupta@example.com",
     maritalStatus: "Single",
     education: "B.Des",
     hobbies: "Photography, Yoga"
-  },
-  {
-    id: 6,
-    name: "Amit Singh",
-    age: 32,
-    gender: "male",
-    location: "chennai",
-    religion: "sikh",
-    profession: "Engineer",
-    height: 168,
-    weight: 65,
-    annualIncome: 75000,
-    phone: "6789012345",
-    email: "amit@example.com",
-    maritalStatus: "Single",
-    education: "B.E.",
-    hobbies: "Gaming, Reading"
   },
 ];
 
@@ -110,10 +93,10 @@ const profiles = [
 // - Religion: "hindu"
 // - Annual Income Range: $50,000 to $80,000
 const candidatePreference = {
-  gender: "female",
-  ageRange: { min: 25, max: 30 },
+  gender: "male",
+  ageRange: { min: 25, max: 35 },
   religion: "hindu",
-  incomeRange: { min: 50000, max: 80000 },
+  incomeRange: { min: 5000, max: 80000 },
 };
 
 module.exports = (req, res) => {

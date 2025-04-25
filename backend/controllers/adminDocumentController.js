@@ -2,24 +2,25 @@ const Document = require("../models/Document");
 
 // Get all pending document approvals
 exports.getPendingApprovals = async (req, res) => {
-    try {
-      const pendingDocuments = await Document.find({ status: 'pending' });
-      // Map each document to include a computed documentUrl field
-      const updatedDocuments = pendingDocuments.map(doc => ({
-        _id: doc._id,
-        userEmail: doc.userEmail,
-        docType: doc.docType,
-        fileName: doc.fileName,
-        status: doc.status,
-        uploadedAt: doc.uploadedAt,
-        // Compute URL using the current request's protocol and host
-        documentUrl: `${req.protocol}://${req.get('host')}/api/documents/get/${doc._id}`
-      }));
-      res.json(updatedDocuments);
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching pending documents", error });
-    }
-  };
+  try {
+    const pendingDocuments = await Document.find({ status: 'pending' });
+    // Map each document to include a computed documentUrl and userId (using userEmail)
+    const updatedDocuments = pendingDocuments.map(doc => ({
+      _id: doc._id,
+      userEmail: doc.userEmail,
+      userId: doc.userEmail, // using email as the user ID
+      docType: doc.docType,
+      fileName: doc.fileName,
+      status: doc.status,
+      uploadedAt: doc.uploadedAt,
+      documentUrl: `${req.protocol}://${req.get('host')}/api/documents/get/${doc._id}`
+    }));
+    res.json(updatedDocuments);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching pending documents", error });
+  }
+};
+
   
 
 // Approve or Reject Document
