@@ -6,7 +6,6 @@ const bodyParser = require("body-parser");
 
 // Import Routes
 const userRoutes = require("./routes/userRoutes");
-const chatRoutes = require("./routes/chatRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const adminDocumentRoutes = require("./routes/adminDocumentRoutes");
 const preferenceRoutes = require("./routes/preferenceRoutes");
@@ -46,7 +45,6 @@ connectDB()
 
 // API Routes
 app.use("/api/users", userRoutes); // User-related routes
-app.use("/api/chats", chatRoutes); // Chat-related routes
 app.use("/api/admin", adminRoutes); // Admin-related routes
 app.use("/api/admin-documents", adminDocumentRoutes); // Admin document approvals
 app.use("/api/preferences", preferenceRoutes); // Preference-related routes

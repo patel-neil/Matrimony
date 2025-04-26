@@ -36,7 +36,7 @@ const searchProfiles = async (req, res) => {
       heightRange,
       weightRange,
       page = 1,
-      limit = 10
+      limit = 50
     } = req.query;
 
     // Build the search query
@@ -139,7 +139,7 @@ const searchProfiles = async (req, res) => {
 const advancedSearch = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 50 } = req.query;
 
     // Get user's preferences
     const userPreferences = await PartnerPreference.findOne({ userId });
