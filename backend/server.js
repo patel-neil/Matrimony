@@ -13,6 +13,7 @@ const profileRoutes = require("./routes/profileRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 const documentRoutes = require("./routes/documentRoutes");
 const searchRoutes = require('./routes/searchRoutes');
+const recommendationRoutes = require('./routes/recommendationRoutes');
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use("/api/profile", profileRoutes); // Profile-related routes
 app.use("/api", uploadRoutes); // File upload routes
 app.use("/api/documents", documentRoutes); // Document-related routes
 app.use('/api/search', searchRoutes); // Search-related routes
+app.use('/api', recommendationRoutes); // Recommendation-related routes
 
 // Health Check Endpoint
 app.get("/api/health", (req, res) => {

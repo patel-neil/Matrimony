@@ -1,0 +1,15 @@
+{
+  "preferences": {
+    "income_range": [100000, 20000000],
+    "gender": "Female",
+    "age_range": [20, 40],
+    "religion": "Hindu",
+    "mother_tongue": "Gujarati",
+    "marital_status": "Never Married",
+    "education": "Graduate",
+    "height_range": [140, 190],
+    "weight_range": [40, 90],
+    "family_type": "Nuclear",
+    "occupation": "Professional"
+  }
+} 

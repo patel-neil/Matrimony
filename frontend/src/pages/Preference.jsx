@@ -9,6 +9,7 @@ const PartnerPreferencePage = () => {
 
   // Essential Preferences (Mandatory)
   const [essentialPrefs, setEssentialPrefs] = useState({
+    gender: '',
     ageRange: { min: 25, max: 35 },
     religion: '',
     motherTongue: '',
@@ -67,8 +68,26 @@ const PartnerPreferencePage = () => {
         const response = await fetch(`http://localhost:5000/api/preferences/${userId}`);
         if (response.ok) {
           const data = await response.json();
-          setEssentialPrefs(data.essentialPrefs);
-          setOptionalPrefs(data.optionalPrefs);
+          // Set all essential preferences including gender
+          setEssentialPrefs({
+            gender: data.essentialPrefs.gender || '',
+            ageRange: data.essentialPrefs.ageRange || { min: 25, max: 35 },
+            religion: data.essentialPrefs.religion || '',
+            motherTongue: data.essentialPrefs.motherTongue || '',
+            maritalStatus: data.essentialPrefs.maritalStatus || '',
+            education: data.essentialPrefs.education || '',
+            height: data.essentialPrefs.height || { min: 150, max: 190 },
+            income: data.essentialPrefs.income || '',
+            familyType: data.essentialPrefs.familyType || '',
+            weight: data.essentialPrefs.weight || { min: 45, max: 90 },
+            occupation: data.essentialPrefs.occupation || ''
+          });
+          setOptionalPrefs(data.optionalPrefs || {
+            hobbies: [],
+            foodPreferences: [],
+            location: [],
+            lifestyleChoices: []
+          });
           setIsUpdate(true);
         }
       } catch (error) {
@@ -81,24 +100,37 @@ const PartnerPreferencePage = () => {
 
   // Options for dropdown menus
   const options = {
-    religion: ['Hindu', 'Muslim', 'Christian', 'Sikh', 'Buddhist', 'Jain', 'Parsi', 'Jewish', 'No Religion', 'Spiritual', 'Other'],
-    motherTongue: ['Hindi', 'Bengali', 'Telugu', 'Marathi', 'Tamil', 'Urdu', 'Gujarati', 'Kannada', 'Odia', 'Punjabi', 'Malayalam', 'English'],
-    maritalStatus: ['Never Married', 'Divorced', 'Widowed', 'Separated'],
-    education: ['High School', 'Bachelor\'s', 'Master\'s', 'Doctorate', 'Diploma', 'Trade School'],
-    income: ['Below ₹5 Lakh', '₹5-10 Lakh', '₹10-15 Lakh', '₹15-20 Lakh', '₹20-30 Lakh', '₹30-50 Lakh', '₹50 Lakh-1 Crore', 'Above ₹1 Crore'],
-    familyType: ['Nuclear', 'Joint', 'Extended', 'Single Parent'],
-    occupation: ['IT Professional', 'Doctor', 'Engineer', 'Teacher/Professor', 'Business Owner', 'Government Employee', 'Finance Professional', 'Lawyer', 'Artist', 'Self-Employed', 'Homemaker', 'Student'],
-    hobbies: ['Reading', 'Cooking', 'Traveling', 'Photography', 'Music', 'Dancing', 'Painting', 'Writing', 'Sports', 'Yoga', 'Meditation', 'Gardening', 'Hiking'],
-    foodPreferences: ['Vegetarian', 'Non-Vegetarian', 'Vegan', 'Eggetarian', 'Jain Food'],
-    location: ['North India', 'South India', 'East India', 'West India', 'Central India', 'Northeast India', 'Metro Cities', 'Tier 2 Cities', 'Rural Areas', 'Willing to Relocate'],
-    lifestyleChoices: ['Early Riser', 'Night Owl', 'Fitness Enthusiast', 'Homebody', 'Social Butterfly', 'Pet Lover', 'Environmentally Conscious', 'Minimalist']
+    gender: ['Male', 'Female'],
+    religion: ['Hindu', 'Muslim', 'Christian', 'Sikh', 'Buddhist', 'Jain', 'Parsi', 'Jewish', 'No Religion', 'Spiritual', 'Other', 'Any'],
+    motherTongue: ['Hindi', 'Bengali', 'Telugu', 'Marathi', 'Tamil', 'Urdu', 'Gujarati', 'Kannada', 'Odia', 'Punjabi', 'Malayalam', 'English', 'Other', 'Any'],
+    maritalStatus: ['Never Married', 'Divorced', 'Widowed', 'Separated', 'Awaiting Divorce', 'Any'],
+    education: ['Any', 'High School', '10+2', 'Diploma', 'B.Tech.', 'B.E.', 'B.Com.', 'BCom', 'B.Sc.', 'BCA', 'BBA', 'B.A.', 'B.Arch', 'BFA', 'B.Music', 'B.Pharm', 'BHM', 'BHMS', 'BAMS', 'BDS', 'BVSc', 'B.Ed', 'M.Tech.', 'MBA', 'MCA', 'M.Sc.', 'M.A.', 'M.Com.', 'M.Arch', 'M.Pharm', 'M.Ed', 'M.Music', 'MFA', 'MS', 'MBBS', 'MD', 'CA', 'CS', 'ICWA', 'LLB', 'LLM', 'PhD'],
+    income: [
+      'Below ₹2 Lakh',
+      '₹2-5 Lakh',
+      '₹5-10 Lakh',
+      '₹10-20 Lakh',
+      '₹20-30 Lakh',
+      '₹30-50 Lakh',
+      '₹50 Lakh-1 Crore',
+      '₹1-2 Crore',
+      '₹2-5 Crore',
+      'Above ₹5 Crore',
+      'Any'
+    ],
+    familyType: ['Any', 'Nuclear', 'Joint', 'Extended', 'Single Parent'],
+    occupation: ['Any', 'IT Professional', 'Doctor', 'Engineer', 'Teacher/Professor', 'Business Owner', 'Government Employee', 'Finance Professional', 'Lawyer', 'Artist', 'Self-Employed', 'Homemaker', 'Student', 'Professional', 'Service', 'Business', 'Other'],
+    hobbies: ['Any', 'Reading', 'Cooking', 'Traveling', 'Photography', 'Music', 'Dancing', 'Painting', 'Writing', 'Sports', 'Yoga', 'Meditation', 'Gardening', 'Hiking', 'Other'],
+    foodPreferences: ['Any', 'Vegetarian', 'Non-Vegetarian', 'Vegan', 'Eggetarian', 'Jain Food', 'Other'],
+    location: ['Any', 'North India', 'South India', 'East India', 'West India', 'Central India', 'Northeast India', 'Metro Cities', 'Tier 2 Cities', 'Rural Areas', 'Willing to Relocate', 'Other'],
+    lifestyleChoices: ['Any', 'Early Riser', 'Night Owl', 'Fitness Enthusiast', 'Homebody', 'Social Butterfly', 'Pet Lover', 'Environmentally Conscious', 'Minimalist', 'Other']
   };
 
   // Handle changes for essential preferences
   const handleEssentialChange = (field, value) => {
     setEssentialPrefs(prev => ({
       ...prev,
-      [field]: value
+      [field]: value // Keep the actual value, including 'Any'
     }));
   };
 
@@ -141,16 +173,10 @@ const PartnerPreferencePage = () => {
   const validateForm = () => {
     const newErrors = {};
     
-    // Check if essential fields are filled
-    if (!essentialPrefs.religion) newErrors.religion = 'Religion is required';
-    if (!essentialPrefs.motherTongue) newErrors.motherTongue = 'Mother tongue is required';
-    if (!essentialPrefs.maritalStatus) newErrors.maritalStatus = 'Marital status is required';
-    if (!essentialPrefs.education) newErrors.education = 'Education is required';
-    if (!essentialPrefs.income) newErrors.income = 'Income is required';
-    if (!essentialPrefs.familyType) newErrors.familyType = 'Family type is required';
-    if (!essentialPrefs.occupation) newErrors.occupation = 'Occupation is required';
+    // Only validate absolutely essential fields
+    if (!essentialPrefs.gender) newErrors.gender = 'Gender is required';
     
-    // Validate ranges
+    // Make other fields optional but validate ranges if provided
     if (essentialPrefs.ageRange.min >= essentialPrefs.ageRange.max) {
       newErrors.ageRange = 'Minimum age should be less than maximum age';
     }
@@ -232,6 +258,32 @@ const PartnerPreferencePage = () => {
             <h2 className="text-2xl font-serif text-rose-700 mb-6 pb-2 border-b border-rose-200">
               Essential Preferences <span className="text-sm text-rose-500 font-sans">(Required)</span>
             </h2>
+            
+            {/* Gender */}
+            <div className="mb-6">
+              <fieldset>
+                <legend className="block text-gray-700 font-medium mb-2">Preferred Gender</legend>
+                <div className="flex flex-wrap gap-4">
+                  {options.gender.map(type => (
+                    <div key={type} className="flex items-center">
+                      <input
+                        type="radio"
+                        id={`gender-${type}`}
+                        name="gender"
+                        value={type}
+                        checked={essentialPrefs.gender === type}
+                        onChange={(e) => handleEssentialChange('gender', e.target.value)}
+                        className="h-4 w-4 text-rose-600 border-gray-300 focus:ring-rose-500"
+                      />
+                      <label htmlFor={`gender-${type}`} className="ml-2 text-gray-700">
+                        {type}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+                {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender}</p>}
+              </fieldset>
+            </div>
             
             {/* Age Range */}
             <div className="mb-8">
@@ -599,6 +651,7 @@ const PartnerPreferencePage = () => {
               <div>
                 <h4 className="font-medium text-gray-700">Essential Preferences</h4>
                 <ul className="mt-2 space-y-1 text-gray-600">
+                  <li>Preferred Gender: {essentialPrefs.gender || "Not specified"}</li>
                   <li>Age: {essentialPrefs.ageRange.min} - {essentialPrefs.ageRange.max} years</li>
                   <li>Religion: {essentialPrefs.religion || "Not specified"}</li>
                   <li>Mother Tongue: {essentialPrefs.motherTongue || "Not specified"}</li>

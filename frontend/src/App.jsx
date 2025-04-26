@@ -3,14 +3,12 @@ import { SignedIn, SignedOut, SignInButton, useUser } from "@clerk/clerk-react";
 import { useEffect } from "react";
 
 import HomePage from './pages/HomePage';
-import ChatPage from './pages/ChatPage';
 import SearchPage from './pages/SearchPage';
-import MatchesPage from './pages/MatchesPage';
 import ProfilePage from './pages/ProfilePage';
 import AdminLogin from './pages/adminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import PartnerPreferencePage from './pages/preference';
-
+import MatchesPage from "./pages/MatchesPage";
 function App() {
   const { user } = useUser(); // Get logged-in user
 
@@ -39,7 +37,6 @@ function App() {
           path="/chat"
           element={
             <SignedIn>
-              <ChatPage />
             </SignedIn>
           }
         />

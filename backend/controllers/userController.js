@@ -8,7 +8,7 @@ const saveUser = async (req, res) => {
 
     // Check if the user already exists
     let user = await User.findOne({ clerkId: id });
-
+    console.log("User:", user.userId);
     if (!user) {
       user = new User({
         clerkId: id,

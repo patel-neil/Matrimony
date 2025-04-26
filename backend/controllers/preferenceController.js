@@ -11,6 +11,16 @@ exports.savePreference = async (req, res) => {
       return res.status(400).json({ error: "User ID is required" });
     }
 
+    // Validate essential preferences
+    if (!essentialPrefs) {
+      return res.status(400).json({ error: "Essential preferences are required" });
+    }
+
+    // Validate gender
+    if (!essentialPrefs.gender || !['Male', 'Female'].includes(essentialPrefs.gender)) {
+      return res.status(400).json({ error: "Gender must be either 'Male' or 'Female'" });
+    }
+
     // Check if the user already has a preference
     const existingPreference = await PartnerPreference.findOne({ userId });
 
@@ -37,6 +47,16 @@ exports.updatePreference = async (req, res) => {
 
     if (!userId) {
       return res.status(400).json({ error: "User ID is required" });
+    }
+
+    // Validate essential preferences
+    if (!essentialPrefs) {
+      return res.status(400).json({ error: "Essential preferences are required" });
+    }
+
+    // Validate gender
+    if (!essentialPrefs.gender || !['Male', 'Female'].includes(essentialPrefs.gender)) {
+      return res.status(400).json({ error: "Gender must be either 'Male' or 'Female'" });
     }
 
     const updatedPreference = await PartnerPreference.findOneAndUpdate(
