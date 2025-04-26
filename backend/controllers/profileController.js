@@ -25,7 +25,11 @@ const saveUserProfile = async (req, res) => {
         if (!profileData.email) {
             return res.status(400).json({ message: "Email is required" });
         }
-
+        console.log("▶️ SAVE PROFILE BODY:", req.body);
+        if (!req.body || !req.body.email) {
+            return res.status(400).json({ message: "Missing email in request body", received: req.body });
+          }
+          
         // Convert dateOfBirth to a Date object if provided
         if (profileData.dateOfBirth) {
             profileData.dateOfBirth = new Date(profileData.dateOfBirth);

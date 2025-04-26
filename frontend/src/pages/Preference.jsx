@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from "@clerk/clerk-react"; // ✅ Import Clerk's authentication hook
+import Layout from "../Components/Layout";
 
 const PartnerPreferencePage = () => {
 
@@ -219,342 +220,344 @@ const PartnerPreferencePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 py-10 px-4">
-      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
-        <div className="bg-rose-100 p-6">
-          <h1 className="text-3xl font-serif text-rose-800 text-center">Partner Preferences</h1>
-          <p className="text-center text-gray-600 mt-2">Tell us about your ideal life partner</p>
+    <Layout>
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 py-10 px-4">
+        <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="bg-rose-100 p-6">
+            <h1 className="text-3xl font-serif text-rose-800 text-center">Partner Preferences</h1>
+            <p className="text-center text-gray-600 mt-2">Tell us about your ideal life partner</p>
+          </div>
+          
+          <form onSubmit={handleSubmit} className="p-6 md:p-8">
+            {/* Essential Preferences Section */}
+            <div className="mb-10">
+              <h2 className="text-2xl font-serif text-rose-700 mb-6 pb-2 border-b border-rose-200">
+                Essential Preferences <span className="text-sm text-rose-500 font-sans">(Required)</span>
+              </h2>
+              
+              {/* Gender */}
+              <div className="mb-6">
+                <fieldset>
+                  <legend className="block text-gray-700 font-medium mb-2">Preferred Gender</legend>
+                  <div className="flex flex-wrap gap-4">
+                    {options.gender.map(type => (
+                      <div key={type} className="flex items-center">
+                        <input
+                          type="radio"
+                          id={`gender-${type}`}
+                          name="gender"
+                          value={type}
+                          checked={essentialPrefs.gender === type}
+                          onChange={(e) => handleEssentialChange('gender', e.target.value)}
+                          className="h-4 w-4 text-rose-600 border-gray-300 focus:ring-rose-500"
+                        />
+                        <label htmlFor={`gender-${type}`} className="ml-2 text-gray-700">
+                          {type}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender}</p>}
+                </fieldset>
+              </div>
+              
+              {/* Age Range */}
+              <div className="mb-8">
+                <label className="block text-gray-700 font-medium mb-2" id="ageRange">
+                  Age Range (years)
+                </label>
+                <div className="flex flex-wrap items-center gap-6">
+                  <div className="w-full md:w-2/3">
+                    <div className="flex justify-between mb-1 text-sm text-gray-500">
+                      <span>18</span>
+                      <span>60</span>
+                    </div>
+                    <div className="flex gap-4">
+                      <input
+                        type="range"
+                        min="18"
+                        max="60"
+                        value={essentialPrefs.ageRange.min}
+                        onChange={(e) => handleRangeChange('ageRange', 'min', e.target.value)}
+                        className="w-full accent-rose-500"
+                      />
+                      <input
+                        type="range"
+                        min="18"
+                        max="60"
+                        value={essentialPrefs.ageRange.max}
+                        onChange={(e) => handleRangeChange('ageRange', 'max', e.target.value)}
+                        className="w-full accent-rose-500"
+                      />
+                    </div>
+                  </div>
+                  <div className="text-rose-700">
+                    {essentialPrefs.ageRange.min} - {essentialPrefs.ageRange.max} years
+                  </div>
+                </div>
+                {errors.ageRange && <p className="text-red-500 text-sm mt-1">{errors.ageRange}</p>}
+              </div>
+              
+              {/* Religion */}
+              <div className="mb-6">
+                <label htmlFor="religion" className="block text-gray-700 font-medium mb-2">
+                  Religion
+                </label>
+                <select
+                  id="religion"
+                  value={essentialPrefs.religion}
+                  onChange={(e) => handleEssentialChange('religion', e.target.value)}
+                  className={`w-full p-3 border ${errors.religion ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:border-rose-300 focus:ring focus:ring-rose-200 focus:ring-opacity-50`}
+                >
+                  <option value="">Select Religion</option>
+                  {options.religion.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+                {errors.religion && <p className="text-red-500 text-sm mt-1">{errors.religion}</p>}
+              </div>
+              
+              {/* Mother Tongue */}
+              <div className="mb-6">
+                <label htmlFor="motherTongue" className="block text-gray-700 font-medium mb-2">
+                  Mother Tongue
+                </label>
+                <select
+                  id="motherTongue"
+                  value={essentialPrefs.motherTongue}
+                  onChange={(e) => handleEssentialChange('motherTongue', e.target.value)}
+                  className={`w-full p-3 border ${errors.motherTongue ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:border-rose-300 focus:ring focus:ring-rose-200 focus:ring-opacity-50`}
+                >
+                  <option value="">Select Mother Tongue</option>
+                  {options.motherTongue.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+                {errors.motherTongue && <p className="text-red-500 text-sm mt-1">{errors.motherTongue}</p>}
+              </div>
+              
+              {/* Marital Status */}
+              <div className="mb-6">
+                <fieldset>
+                  <legend className="block text-gray-700 font-medium mb-2">Marital Status</legend>
+                  <div className="flex flex-wrap gap-4">
+                    {options.maritalStatus.map(status => (
+                      <div key={status} className="flex items-center">
+                        <input
+                          type="radio"
+                          id={`marital-${status}`}
+                          name="maritalStatus"
+                          value={status}
+                          checked={essentialPrefs.maritalStatus === status}
+                          onChange={(e) => handleEssentialChange('maritalStatus', e.target.value)}
+                          className="h-4 w-4 text-rose-600 border-gray-300 focus:ring-rose-500"
+                        />
+                        <label htmlFor={`marital-${status}`} className="ml-2 text-gray-700">
+                          {status}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  {errors.maritalStatus && <p className="text-red-500 text-sm mt-1">{errors.maritalStatus}</p>}
+                </fieldset>
+              </div>
+              
+              {/* Education */}
+              <div className="mb-6">
+                <label htmlFor="education" className="block text-gray-700 font-medium mb-2">
+                  Minimum Education
+                </label>
+                <select
+                  id="education"
+                  value={essentialPrefs.education}
+                  onChange={(e) => handleEssentialChange('education', e.target.value)}
+                  className={`w-full p-3 border ${errors.education ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:border-rose-300 focus:ring focus:ring-rose-200 focus:ring-opacity-50`}
+                >
+                  <option value="">Select Education Level</option>
+                  {options.education.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+                {errors.education && <p className="text-red-500 text-sm mt-1">{errors.education}</p>}
+              </div>
+              
+              {/* Income */}
+              <div className="mb-6">
+                <label htmlFor="income" className="block text-gray-700 font-medium mb-2">
+                  Annual Income
+                </label>
+                <select
+                  id="income"
+                  value={essentialPrefs.income}
+                  onChange={(e) => handleEssentialChange('income', e.target.value)}
+                  className={`w-full p-3 border ${errors.income ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:border-rose-300 focus:ring focus:ring-rose-200 focus:ring-opacity-50`}
+                >
+                  <option value="">Select Income Range</option>
+                  {options.income.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+                {errors.income && <p className="text-red-500 text-sm mt-1">{errors.income}</p>}
+              </div>
+              
+              {/* Family Type */}
+              <div className="mb-6">
+                <fieldset>
+                  <legend className="block text-gray-700 font-medium mb-2">Family Type</legend>
+                  <div className="flex flex-wrap gap-4">
+                    {options.familyType.map(type => (
+                      <div key={type} className="flex items-center">
+                        <input
+                          type="radio"
+                          id={`family-${type}`}
+                          name="familyType"
+                          value={type}
+                          checked={essentialPrefs.familyType === type}
+                          onChange={(e) => handleEssentialChange('familyType', e.target.value)}
+                          className="h-4 w-4 text-rose-600 border-gray-300 focus:ring-rose-500"
+                        />
+                        <label htmlFor={`family-${type}`} className="ml-2 text-gray-700">
+                          {type}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  {errors.familyType && <p className="text-red-500 text-sm mt-1">{errors.familyType}</p>}
+                </fieldset>
+              </div>
+              
+              {/* Occupation */}
+              <div className="mb-6">
+                <label htmlFor="occupation" className="block text-gray-700 font-medium mb-2">
+                  Occupation
+                </label>
+                <select
+                  id="occupation"
+                  value={essentialPrefs.occupation}
+                  onChange={(e) => handleEssentialChange('occupation', e.target.value)}
+                  className={`w-full p-3 border ${errors.occupation ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:border-rose-300 focus:ring focus:ring-rose-200 focus:ring-opacity-50`}
+                >
+                  <option value="">Select Occupation</option>
+                  {options.occupation.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+                {errors.occupation && <p className="text-red-500 text-sm mt-1">{errors.occupation}</p>}
+              </div>
+              
+              {/* Height Range */}
+              <div className="mb-6">
+                <label className="block text-gray-700 font-medium mb-2" id="height">
+                  Height Range
+                </label>
+                <div className="flex flex-wrap items-center gap-6">
+                  <div className="w-full md:w-2/3">
+                    <div className="flex justify-between mb-1 text-sm text-gray-500">
+                      <span>4'7" (140cm)</span>
+                      <span>6'6" (198cm)</span>
+                    </div>
+                    <div className="flex gap-4">
+                      <input
+                        type="range"
+                        min="140"
+                        max="198"
+                        value={essentialPrefs.height.min}
+                        onChange={(e) => handleRangeChange('height', 'min', e.target.value)}
+                        className="w-full accent-rose-500"
+                      />
+                      <input
+                        type="range"
+                        min="140"
+                        max="198"
+                        value={essentialPrefs.height.max}
+                        onChange={(e) => handleRangeChange('height', 'max', e.target.value)}
+                        className="w-full accent-rose-500"
+                      />
+                    </div>
+                  </div>
+                  <div className="text-rose-700">
+                    {formatHeight(essentialPrefs.height.min)} - {formatHeight(essentialPrefs.height.max)}
+                  </div>
+                </div>
+                {errors.height && <p className="text-red-500 text-sm mt-1">{errors.height}</p>}
+              </div>
+              
+              {/* Weight Range */}
+              <div className="mb-6">
+                <label className="block text-gray-700 font-medium mb-2" id="weight">
+                  Weight Range (kg)
+                </label>
+                <div className="flex flex-wrap items-center gap-6">
+                  <div className="w-full md:w-2/3">
+                    <div className="flex justify-between mb-1 text-sm text-gray-500">
+                      <span>45 kg</span>
+                      <span>120 kg</span>
+                    </div>
+                    <div className="flex gap-4">
+                      <input
+                        type="range"
+                        min="45"
+                        max="120"
+                        value={essentialPrefs.weight.min}
+                        onChange={(e) => handleRangeChange('weight', 'min', e.target.value)}
+                        className="w-full accent-rose-500"
+                      />
+                      <input
+                        type="range"
+                        min="45"
+                        max="120"
+                        value={essentialPrefs.weight.max}
+                        onChange={(e) => handleRangeChange('weight', 'max', e.target.value)}
+                        className="w-full accent-rose-500"
+                      />
+                    </div>
+                  </div>
+                  <div className="text-rose-700">
+                    {essentialPrefs.weight.min} - {essentialPrefs.weight.max} kg
+                  </div>
+                </div>
+                {errors.weight && <p className="text-red-500 text-sm mt-1">{errors.weight}</p>}
+              </div>
+            </div>
+            
+            {/* Preference Summary Card */}
+            <div className="bg-rose-50 p-6 rounded-lg shadow-sm mb-8">
+              <h3 className="text-xl font-serif text-rose-700 mb-4">Your Preference Summary</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-medium text-gray-700">Essential Preferences</h4>
+                  <ul className="mt-2 space-y-1 text-gray-600">
+                    <li>Preferred Gender: {essentialPrefs.gender || "Not specified"}</li>
+                    <li>Age: {essentialPrefs.ageRange.min} - {essentialPrefs.ageRange.max} years</li>
+                    <li>Religion: {essentialPrefs.religion || "Not specified"}</li>
+                    <li>Mother Tongue: {essentialPrefs.motherTongue || "Not specified"}</li>
+                    <li>Marital Status: {essentialPrefs.maritalStatus || "Not specified"}</li>
+                    <li>Education: {essentialPrefs.education || "Not specified"}</li>
+                    <li>Income: {essentialPrefs.income || "Not specified"}</li>
+                    <li>Family Type: {essentialPrefs.familyType || "Not specified"}</li>
+                    <li>Occupation: {essentialPrefs.occupation || "Not specified"}</li>
+                    <li>Height: {formatHeight(essentialPrefs.height.min)} - {formatHeight(essentialPrefs.height.max)}</li>
+                    <li>Weight: {essentialPrefs.weight.min} - {essentialPrefs.weight.max} kg</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            {/* Submit Button */}
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={handleSubmit}
+                className="px-8 py-3 bg-rose-600 text-white font-medium rounded-md shadow-md hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-opacity-50 transition-colors"
+              >
+                Save My Partner Preferences
+              </button>
+            </div>
+          </form>
         </div>
-        
-        <form onSubmit={handleSubmit} className="p-6 md:p-8">
-          {/* Essential Preferences Section */}
-          <div className="mb-10">
-            <h2 className="text-2xl font-serif text-rose-700 mb-6 pb-2 border-b border-rose-200">
-              Essential Preferences <span className="text-sm text-rose-500 font-sans">(Required)</span>
-            </h2>
-            
-            {/* Gender */}
-            <div className="mb-6">
-              <fieldset>
-                <legend className="block text-gray-700 font-medium mb-2">Preferred Gender</legend>
-                <div className="flex flex-wrap gap-4">
-                  {options.gender.map(type => (
-                    <div key={type} className="flex items-center">
-                      <input
-                        type="radio"
-                        id={`gender-${type}`}
-                        name="gender"
-                        value={type}
-                        checked={essentialPrefs.gender === type}
-                        onChange={(e) => handleEssentialChange('gender', e.target.value)}
-                        className="h-4 w-4 text-rose-600 border-gray-300 focus:ring-rose-500"
-                      />
-                      <label htmlFor={`gender-${type}`} className="ml-2 text-gray-700">
-                        {type}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-                {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender}</p>}
-              </fieldset>
-            </div>
-            
-            {/* Age Range */}
-            <div className="mb-8">
-              <label className="block text-gray-700 font-medium mb-2" id="ageRange">
-                Age Range (years)
-              </label>
-              <div className="flex flex-wrap items-center gap-6">
-                <div className="w-full md:w-2/3">
-                  <div className="flex justify-between mb-1 text-sm text-gray-500">
-                    <span>18</span>
-                    <span>60</span>
-                  </div>
-                  <div className="flex gap-4">
-                    <input
-                      type="range"
-                      min="18"
-                      max="60"
-                      value={essentialPrefs.ageRange.min}
-                      onChange={(e) => handleRangeChange('ageRange', 'min', e.target.value)}
-                      className="w-full accent-rose-500"
-                    />
-                    <input
-                      type="range"
-                      min="18"
-                      max="60"
-                      value={essentialPrefs.ageRange.max}
-                      onChange={(e) => handleRangeChange('ageRange', 'max', e.target.value)}
-                      className="w-full accent-rose-500"
-                    />
-                  </div>
-                </div>
-                <div className="text-rose-700">
-                  {essentialPrefs.ageRange.min} - {essentialPrefs.ageRange.max} years
-                </div>
-              </div>
-              {errors.ageRange && <p className="text-red-500 text-sm mt-1">{errors.ageRange}</p>}
-            </div>
-            
-            {/* Religion */}
-            <div className="mb-6">
-              <label htmlFor="religion" className="block text-gray-700 font-medium mb-2">
-                Religion
-              </label>
-              <select
-                id="religion"
-                value={essentialPrefs.religion}
-                onChange={(e) => handleEssentialChange('religion', e.target.value)}
-                className={`w-full p-3 border ${errors.religion ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:border-rose-300 focus:ring focus:ring-rose-200 focus:ring-opacity-50`}
-              >
-                <option value="">Select Religion</option>
-                {options.religion.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-              {errors.religion && <p className="text-red-500 text-sm mt-1">{errors.religion}</p>}
-            </div>
-            
-            {/* Mother Tongue */}
-            <div className="mb-6">
-              <label htmlFor="motherTongue" className="block text-gray-700 font-medium mb-2">
-                Mother Tongue
-              </label>
-              <select
-                id="motherTongue"
-                value={essentialPrefs.motherTongue}
-                onChange={(e) => handleEssentialChange('motherTongue', e.target.value)}
-                className={`w-full p-3 border ${errors.motherTongue ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:border-rose-300 focus:ring focus:ring-rose-200 focus:ring-opacity-50`}
-              >
-                <option value="">Select Mother Tongue</option>
-                {options.motherTongue.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-              {errors.motherTongue && <p className="text-red-500 text-sm mt-1">{errors.motherTongue}</p>}
-            </div>
-            
-            {/* Marital Status */}
-            <div className="mb-6">
-              <fieldset>
-                <legend className="block text-gray-700 font-medium mb-2">Marital Status</legend>
-                <div className="flex flex-wrap gap-4">
-                  {options.maritalStatus.map(status => (
-                    <div key={status} className="flex items-center">
-                      <input
-                        type="radio"
-                        id={`marital-${status}`}
-                        name="maritalStatus"
-                        value={status}
-                        checked={essentialPrefs.maritalStatus === status}
-                        onChange={(e) => handleEssentialChange('maritalStatus', e.target.value)}
-                        className="h-4 w-4 text-rose-600 border-gray-300 focus:ring-rose-500"
-                      />
-                      <label htmlFor={`marital-${status}`} className="ml-2 text-gray-700">
-                        {status}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-                {errors.maritalStatus && <p className="text-red-500 text-sm mt-1">{errors.maritalStatus}</p>}
-              </fieldset>
-            </div>
-            
-            {/* Education */}
-            <div className="mb-6">
-              <label htmlFor="education" className="block text-gray-700 font-medium mb-2">
-                Minimum Education
-              </label>
-              <select
-                id="education"
-                value={essentialPrefs.education}
-                onChange={(e) => handleEssentialChange('education', e.target.value)}
-                className={`w-full p-3 border ${errors.education ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:border-rose-300 focus:ring focus:ring-rose-200 focus:ring-opacity-50`}
-              >
-                <option value="">Select Education Level</option>
-                {options.education.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-              {errors.education && <p className="text-red-500 text-sm mt-1">{errors.education}</p>}
-            </div>
-            
-            {/* Income */}
-            <div className="mb-6">
-              <label htmlFor="income" className="block text-gray-700 font-medium mb-2">
-                Annual Income
-              </label>
-              <select
-                id="income"
-                value={essentialPrefs.income}
-                onChange={(e) => handleEssentialChange('income', e.target.value)}
-                className={`w-full p-3 border ${errors.income ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:border-rose-300 focus:ring focus:ring-rose-200 focus:ring-opacity-50`}
-              >
-                <option value="">Select Income Range</option>
-                {options.income.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-              {errors.income && <p className="text-red-500 text-sm mt-1">{errors.income}</p>}
-            </div>
-            
-            {/* Family Type */}
-            <div className="mb-6">
-              <fieldset>
-                <legend className="block text-gray-700 font-medium mb-2">Family Type</legend>
-                <div className="flex flex-wrap gap-4">
-                  {options.familyType.map(type => (
-                    <div key={type} className="flex items-center">
-                      <input
-                        type="radio"
-                        id={`family-${type}`}
-                        name="familyType"
-                        value={type}
-                        checked={essentialPrefs.familyType === type}
-                        onChange={(e) => handleEssentialChange('familyType', e.target.value)}
-                        className="h-4 w-4 text-rose-600 border-gray-300 focus:ring-rose-500"
-                      />
-                      <label htmlFor={`family-${type}`} className="ml-2 text-gray-700">
-                        {type}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-                {errors.familyType && <p className="text-red-500 text-sm mt-1">{errors.familyType}</p>}
-              </fieldset>
-            </div>
-            
-            {/* Occupation */}
-            <div className="mb-6">
-              <label htmlFor="occupation" className="block text-gray-700 font-medium mb-2">
-                Occupation
-              </label>
-              <select
-                id="occupation"
-                value={essentialPrefs.occupation}
-                onChange={(e) => handleEssentialChange('occupation', e.target.value)}
-                className={`w-full p-3 border ${errors.occupation ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:border-rose-300 focus:ring focus:ring-rose-200 focus:ring-opacity-50`}
-              >
-                <option value="">Select Occupation</option>
-                {options.occupation.map(option => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
-              </select>
-              {errors.occupation && <p className="text-red-500 text-sm mt-1">{errors.occupation}</p>}
-            </div>
-            
-            {/* Height Range */}
-            <div className="mb-6">
-              <label className="block text-gray-700 font-medium mb-2" id="height">
-                Height Range
-              </label>
-              <div className="flex flex-wrap items-center gap-6">
-                <div className="w-full md:w-2/3">
-                  <div className="flex justify-between mb-1 text-sm text-gray-500">
-                    <span>4'7" (140cm)</span>
-                    <span>6'6" (198cm)</span>
-                  </div>
-                  <div className="flex gap-4">
-                    <input
-                      type="range"
-                      min="140"
-                      max="198"
-                      value={essentialPrefs.height.min}
-                      onChange={(e) => handleRangeChange('height', 'min', e.target.value)}
-                      className="w-full accent-rose-500"
-                    />
-                    <input
-                      type="range"
-                      min="140"
-                      max="198"
-                      value={essentialPrefs.height.max}
-                      onChange={(e) => handleRangeChange('height', 'max', e.target.value)}
-                      className="w-full accent-rose-500"
-                    />
-                  </div>
-                </div>
-                <div className="text-rose-700">
-                  {formatHeight(essentialPrefs.height.min)} - {formatHeight(essentialPrefs.height.max)}
-                </div>
-              </div>
-              {errors.height && <p className="text-red-500 text-sm mt-1">{errors.height}</p>}
-            </div>
-            
-            {/* Weight Range */}
-            <div className="mb-6">
-              <label className="block text-gray-700 font-medium mb-2" id="weight">
-                Weight Range (kg)
-              </label>
-              <div className="flex flex-wrap items-center gap-6">
-                <div className="w-full md:w-2/3">
-                  <div className="flex justify-between mb-1 text-sm text-gray-500">
-                    <span>45 kg</span>
-                    <span>120 kg</span>
-                  </div>
-                  <div className="flex gap-4">
-                    <input
-                      type="range"
-                      min="45"
-                      max="120"
-                      value={essentialPrefs.weight.min}
-                      onChange={(e) => handleRangeChange('weight', 'min', e.target.value)}
-                      className="w-full accent-rose-500"
-                    />
-                    <input
-                      type="range"
-                      min="45"
-                      max="120"
-                      value={essentialPrefs.weight.max}
-                      onChange={(e) => handleRangeChange('weight', 'max', e.target.value)}
-                      className="w-full accent-rose-500"
-                    />
-                  </div>
-                </div>
-                <div className="text-rose-700">
-                  {essentialPrefs.weight.min} - {essentialPrefs.weight.max} kg
-                </div>
-              </div>
-              {errors.weight && <p className="text-red-500 text-sm mt-1">{errors.weight}</p>}
-            </div>
-          </div>
-          
-          {/* Preference Summary Card */}
-          <div className="bg-rose-50 p-6 rounded-lg shadow-sm mb-8">
-            <h3 className="text-xl font-serif text-rose-700 mb-4">Your Preference Summary</h3>
-            
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-medium text-gray-700">Essential Preferences</h4>
-                <ul className="mt-2 space-y-1 text-gray-600">
-                  <li>Preferred Gender: {essentialPrefs.gender || "Not specified"}</li>
-                  <li>Age: {essentialPrefs.ageRange.min} - {essentialPrefs.ageRange.max} years</li>
-                  <li>Religion: {essentialPrefs.religion || "Not specified"}</li>
-                  <li>Mother Tongue: {essentialPrefs.motherTongue || "Not specified"}</li>
-                  <li>Marital Status: {essentialPrefs.maritalStatus || "Not specified"}</li>
-                  <li>Education: {essentialPrefs.education || "Not specified"}</li>
-                  <li>Income: {essentialPrefs.income || "Not specified"}</li>
-                  <li>Family Type: {essentialPrefs.familyType || "Not specified"}</li>
-                  <li>Occupation: {essentialPrefs.occupation || "Not specified"}</li>
-                  <li>Height: {formatHeight(essentialPrefs.height.min)} - {formatHeight(essentialPrefs.height.max)}</li>
-                  <li>Weight: {essentialPrefs.weight.min} - {essentialPrefs.weight.max} kg</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          
-          {/* Submit Button */}
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="px-8 py-3 bg-rose-600 text-white font-medium rounded-md shadow-md hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-opacity-50 transition-colors"
-            >
-              Save My Partner Preferences
-            </button>
-          </div>
-        </form>
       </div>
-    </div>
+    </Layout>
   );
 };
 

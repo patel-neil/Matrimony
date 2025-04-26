@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Upload, Camera, MapPin, Book, Briefcase, Heart, Lock, CheckCircle, Share2, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getUserProfile, saveProfile } from "../assets/api";
+import { useUser } from "@clerk/clerk-react";
+import Layout from "../Components/Layout";
 
 const ProfileSystem = () => {
   const [step, setStep] = useState(1);
@@ -103,7 +105,7 @@ const ProfileSystem = () => {
         const encodedEmail = encodeURIComponent(storedUser.email);
   
         // Call the API to fetch additional details, including document data
-        const response = await fetch(`http://localhost:5000/api/users/getuser/${encodedEmail}`);
+        const response = await fetch(`http://localhost:5000/api/users/getUser/${encodedEmail}`);
         if (!response.ok) {
           console.error(`Error fetching user details: ${response.status} ${response.statusText}`);
           return;
@@ -1344,160 +1346,162 @@ const handleDocumentUpload = async (docType, file) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-3xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          {/* Progress Bar */}
-          <div className="mb-8">
-            <div className="flex justify-between mb-2">
-              <span className="text-sm font-medium">Profile Completion</span>
-              <span className="text-sm font-medium">{calculateProgress()}%</span>
+    <Layout>
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 py-10 px-4">
+        <div className="max-w-3xl mx-auto px-4">
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            {/* Progress Bar */}
+            <div className="mb-8">
+              <div className="flex justify-between mb-2">
+                <span className="text-sm font-medium">Profile Completion</span>
+                <span className="text-sm font-medium">{calculateProgress()}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${calculateProgress()}%` }}
+                ></div>
+              </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${calculateProgress()}%` }}
-              ></div>
+
+            {getStepContent()}
+
+            <div className="mt-8 flex justify-between">
+              <button
+                onClick={prevStep}
+                disabled={step === 1}
+                className={`px-4 py-2 rounded-md ${
+                  step === 1
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : 'bg-gray-200 hover:bg-gray-300'
+                }`}
+              >
+                Previous
+              </button>
+              <button
+                onClick={step === TOTAL_STEPS ? submitProfile : nextStep}
+                disabled={loading}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center space-x-2"
+              >
+                {loading ? (
+                  <>
+                    <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <span>{step === TOTAL_STEPS ? 'Submit Profile' : 'Next'}</span>
+                )}
+              </button>
             </div>
           </div>
 
-          {getStepContent()}
+          {/* Verification Status Panel */}
+          {verificationStatus && (
+            <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
+              <div className="flex items-center space-x-3 mb-4">
+                <CheckCircle className={`w-6 h-6 ${
+                  verificationStatus === 'verified' ? 'text-green-500' :
+                  verificationStatus === 'pending' ? 'text-yellow-500' :
+                  'text-red-500'
+                }`} />
+                <h3 className="text-lg font-medium">Verification Status</h3>
+              </div>
 
-          <div className="mt-8 flex justify-between">
-            <button
-              onClick={prevStep}
-              disabled={step === 1}
-              className={`px-4 py-2 rounded-md ${
-                step === 1
-                  ? 'bg-gray-300 cursor-not-allowed'
-                  : 'bg-gray-200 hover:bg-gray-300'
-              }`}
-            >
-              Previous
-            </button>
-            <button
-              onClick={step === TOTAL_STEPS ? submitProfile : nextStep}
-              disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center space-x-2"
-            >
-              {loading ? (
-                <>
-                  <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
-                  <span>Processing...</span>
-                </>
-              ) : (
-                <span>{step === TOTAL_STEPS ? 'Submit Profile' : 'Next'}</span>
-              )}
-            </button>
-          </div>
-        </div>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                  <div>
+                    <p className="font-medium">Profile Verification</p>
+                    <p className="text-sm text-gray-500">
+                      {verificationStatus === 'verified' ? 'Your profile is verified' :
+                       verificationStatus === 'pending' ? 'Under review by our team' :
+                       'Verification required'}
+                    </p>
+                  </div>
+                  
+                </div>
 
-        {/* Verification Status Panel */}
-        {verificationStatus && (
+                {/* Updated Document Verification Status */}
+                <div className="space-y-2">
+                  {documents.map(doc => (
+                    <div key={doc.key} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                      <span className="text-sm">{doc.label}</span>
+                      <span className="text-sm text-gray-500">
+                        {formData[doc.key]
+                          ? formData[doc.key].status === 'approved'
+                            ? 'Verified'
+                            : formData[doc.key].status === 'rejected'
+                              ? 'Rejected'
+                              : 'Uploaded'
+                          : 'Pending'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Social Media Links */}
           <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
             <div className="flex items-center space-x-3 mb-4">
-              <CheckCircle className={`w-6 h-6 ${
-                verificationStatus === 'verified' ? 'text-green-500' :
-                verificationStatus === 'pending' ? 'text-yellow-500' :
-                'text-red-500'
-              }`} />
-              <h3 className="text-lg font-medium">Verification Status</h3>
+              <Share2 className="w-6 h-6 text-gray-600" />
+              <h3 className="text-lg font-medium">Social Media Links</h3>
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                <div>
-                  <p className="font-medium">Profile Verification</p>
-                  <p className="text-sm text-gray-500">
-                    {verificationStatus === 'verified' ? 'Your profile is verified' :
-                     verificationStatus === 'pending' ? 'Under review by our team' :
-                     'Verification required'}
-                  </p>
-                </div>
-                
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  LinkedIn Profile (Optional)
+                </label>
+                <input
+                  type="url"
+                  name="linkedin"
+                  value={formData.linkedin}
+                  onChange={handleInputChange}
+                  placeholder="https://linkedin.com/in/yourprofile"
+                  className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
               </div>
 
-              {/* Updated Document Verification Status */}
-              <div className="space-y-2">
-                {documents.map(doc => (
-                  <div key={doc.key} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-                    <span className="text-sm">{doc.label}</span>
-                    <span className="text-sm text-gray-500">
-                      {formData[doc.key]
-                        ? formData[doc.key].status === 'approved'
-                          ? 'Verified'
-                          : formData[doc.key].status === 'rejected'
-                            ? 'Rejected'
-                            : 'Uploaded'
-                        : 'Pending'}
-                    </span>
-                  </div>
-                ))}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Instagram Profile (Optional)
+                </label>
+                <input
+                  type="url"
+                  name="instagram"
+                  value={formData.instagram}
+                  onChange={handleInputChange}
+                  placeholder="https://instagram.com/yourprofile"
+                  className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
               </div>
+
+              {/* Save Button */}
+              <button
+                onClick={handleSaveSocialMedia}
+                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Save Social Media Links
+              </button>
             </div>
           </div>
-        )}
 
-        {/* Social Media Links */}
-        <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
-          <div className="flex items-center space-x-3 mb-4">
-            <Share2 className="w-6 h-6 text-gray-600" />
-            <h3 className="text-lg font-medium">Social Media Links</h3>
+          {/* Document Verification Section */}
+          <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
+            {renderVerification()}
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                LinkedIn Profile (Optional)
-              </label>
-              <input
-                type="url"
-                name="linkedin"
-                value={formData.linkedin}
-                onChange={handleInputChange}
-                placeholder="https://linkedin.com/in/yourprofile"
-                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+          {/* Auto-save Indicator */}
+          {autoSaveTimer && (
+            <div className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-md text-sm flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-500 border-t-white"></div>
+              <span>Saving changes...</span>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Instagram Profile (Optional)
-              </label>
-              <input
-                type="url"
-                name="instagram"
-                value={formData.instagram}
-                onChange={handleInputChange}
-                placeholder="https://instagram.com/yourprofile"
-                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            {/* Save Button */}
-            <button
-              onClick={handleSaveSocialMedia}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              Save Social Media Links
-            </button>
-          </div>
+          )}
         </div>
-
-        {/* Document Verification Section */}
-        <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
-          {renderVerification()}
-        </div>
-
-        {/* Auto-save Indicator */}
-        {autoSaveTimer && (
-          <div className="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-md text-sm flex items-center space-x-2">
-            <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-500 border-t-white"></div>
-            <span>Saving changes...</span>
-          </div>
-        )}
       </div>
-    </div>
+    </Layout>
   );
 };
 

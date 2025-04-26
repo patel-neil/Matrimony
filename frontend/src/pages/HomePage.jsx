@@ -13,7 +13,7 @@ const HomePage = () => {
 
     try {
       const response = await axios.post("http://localhost:5000/api/users/save-user", {
-        id: user.id,
+        clerkId: user.id,
         username: user.username || user.firstName || user.emailAddresses[0]?.emailAddress.split("@")[0],
         email: user.emailAddresses[0]?.emailAddress,
         phoneNumber: user.phoneNumbers[0]?.phoneNumber || "",

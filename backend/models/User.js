@@ -9,19 +9,6 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   phoneNumber: { type: String, required: false },
-  firstName: {
-    type: String,
-    required: true
-  },
-  lastName: {
-    type: String,
-    required: true
-  },
-  gender: {
-    type: String,
-    required: true,
-    enum: ['Male', 'Female']
-  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: {
     type: Date,
