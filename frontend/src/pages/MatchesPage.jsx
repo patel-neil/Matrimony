@@ -11,8 +11,7 @@ const MatchesPage = () => {
   // Fetch recommendations from the backend
   useEffect(() => {
     if (!user) {
-      setLoading(false);
-      setError("Please log in to view matches");
+      setLoading(true); // Keep loading state true while user is being fetched
       return;
     }
 

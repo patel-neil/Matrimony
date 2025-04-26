@@ -3101,3 +3101,258 @@ Unique values in dataset:
 2025-04-26 20:39:06,478 - INFO - After income filter: 2 profiles
 2025-04-26 20:39:06,478 - INFO - Final number of candidates: 2
 2025-04-26 20:39:06,480 - INFO - Returning top 2 matches
+2025-04-26 20:41:53,500 - INFO - Received preferences: {
+  "preferences": {
+    "gender": "Male",
+    "age_range": [
+      20,
+      40
+    ],
+    "religion": "Hindu",
+    "mother_tongue": "Gujarati",
+    "marital_status": "Never Married",
+    "education": "B.E.",
+    "height_range": [
+      150,
+      190
+    ],
+    "weight_range": [
+      45,
+      90
+    ],
+    "income_range": [
+      "Any",
+      "Any"
+    ],
+    "family_type": "Any",
+    "occupation": "Professional"
+  }
+}
+2025-04-26 20:41:57,651 - INFO - Connected to MongoDB
+2025-04-26 20:41:59,638 - INFO - Found 1000 profiles
+2025-04-26 20:41:59,645 - INFO - Processed 1000 profiles with complete data
+2025-04-26 20:41:59,645 - INFO - Positive matches: 0
+2025-04-26 20:41:59,645 - INFO - Negative matches: 1000
+2025-04-26 20:41:59,646 - INFO - Received preferences: {
+  "gender": "Male",
+  "age_range": [
+    20,
+    40
+  ],
+  "religion": "Hindu",
+  "mother_tongue": "Gujarati",
+  "marital_status": "Never Married",
+  "education": "B.E.",
+  "height_range": [
+    150,
+    190
+  ],
+  "weight_range": [
+    45,
+    90
+  ],
+  "income_range": [
+    "Any",
+    "Any"
+  ],
+  "family_type": "Any",
+  "occupation": "Professional"
+}
+2025-04-26 20:41:59,646 - INFO - Initial number of profiles: 1000
+2025-04-26 20:41:59,647 - INFO - 
+Unique values in dataset:
+2025-04-26 20:41:59,647 - INFO - Gender: ['Male' 'Female']
+2025-04-26 20:41:59,647 - INFO - Religion: ['Muslim' 'Christian' 'Sikh' 'Parsi' 'Buddhist' 'Jewish' 'Hindu' 'Jain']
+2025-04-26 20:41:59,648 - INFO - Mother Tongue: ['Gujarati' 'Telugu' 'Konkani' 'Sanskrit' 'Sindhi' 'Urdu' 'Punjabi'
+ 'Malayalam' 'Dogri' 'Marathi' 'Manipuri' 'Kashmiri' 'Hindi' 'Maithili'
+ 'Tamil' 'Bengali' 'Odia' 'Kannada' 'Nepali' 'Assamese']
+2025-04-26 20:41:59,648 - INFO - Marital Status: ['Never Married' 'Awaiting Divorce' 'Widowed' 'Divorced']
+2025-04-26 20:41:59,648 - INFO - Education: ['LLM' 'BFA' 'B.Music' 'BCom' 'M.Pharm' '10+2' 'M.Tech.' 'BHM' 'M.Arch'
+ 'B.Sc.' 'MD' 'B.Tech.' 'B.Pharm' 'M.Ed' 'BHMS' 'MCA' 'CA' 'B.Arch' 'MBA'
+ 'BAMS' 'MS' 'B.Com.' 'MFA' 'ICWA' 'M.A.' 'High School' 'BCA' 'LLB' 'B.A.'
+ 'BVSc' 'PhD' 'BBA' 'BDS' 'M.Sc.' 'CS' 'B.Ed' 'M.Com.' 'M.Music' 'MBBS'
+ 'Diploma']
+2025-04-26 20:41:59,649 - INFO - Income USD range: 3775.0 to 66250.0
+2025-04-26 20:41:59,649 - INFO - Height range: 150 to 180
+2025-04-26 20:41:59,649 - INFO - Weight range: 45 to 90
+2025-04-26 20:41:59,650 - INFO - After gender filter: 494 profiles
+2025-04-26 20:41:59,651 - INFO - After age filter: 383 profiles
+2025-04-26 20:41:59,651 - INFO - After religion filter: 60 profiles
+2025-04-26 20:41:59,653 - INFO - After mother tongue filter: 4 profiles
+2025-04-26 20:41:59,654 - INFO - After marital status filter: 2 profiles
+2025-04-26 20:41:59,654 - INFO - After education filter: 2 profiles
+2025-04-26 20:41:59,655 - INFO - After height filter: 2 profiles
+2025-04-26 20:41:59,656 - INFO - After weight filter: 2 profiles
+2025-04-26 20:41:59,656 - INFO - After income filter: 2 profiles
+2025-04-26 20:41:59,656 - INFO - Final number of candidates: 2
+2025-04-26 20:41:59,657 - INFO - Returning top 2 matches
+2025-04-26 20:44:14,914 - INFO - Received preferences: {
+  "preferences": {
+    "gender": "Male",
+    "age_range": [
+      20,
+      40
+    ],
+    "religion": "Hindu",
+    "mother_tongue": "Gujarati",
+    "marital_status": "Never Married",
+    "education": "B.E.",
+    "height_range": [
+      150,
+      190
+    ],
+    "weight_range": [
+      45,
+      90
+    ],
+    "income_range": [
+      "Any",
+      "Any"
+    ],
+    "family_type": "Any",
+    "occupation": "Professional"
+  }
+}
+2025-04-26 20:44:18,994 - INFO - Connected to MongoDB
+2025-04-26 20:44:20,347 - INFO - Found 1000 profiles
+2025-04-26 20:44:20,372 - INFO - Processed 1000 profiles with complete data
+2025-04-26 20:44:20,373 - INFO - Positive matches: 0
+2025-04-26 20:44:20,373 - INFO - Negative matches: 1000
+2025-04-26 20:44:20,377 - INFO - Received preferences: {
+  "gender": "Male",
+  "age_range": [
+    20,
+    40
+  ],
+  "religion": "Hindu",
+  "mother_tongue": "Gujarati",
+  "marital_status": "Never Married",
+  "education": "B.E.",
+  "height_range": [
+    150,
+    190
+  ],
+  "weight_range": [
+    45,
+    90
+  ],
+  "income_range": [
+    "Any",
+    "Any"
+  ],
+  "family_type": "Any",
+  "occupation": "Professional"
+}
+2025-04-26 20:44:20,377 - INFO - Initial number of profiles: 1000
+2025-04-26 20:44:20,377 - INFO - 
+Unique values in dataset:
+2025-04-26 20:44:20,379 - INFO - Gender: ['Male' 'Female']
+2025-04-26 20:44:20,380 - INFO - Religion: ['Muslim' 'Christian' 'Sikh' 'Parsi' 'Buddhist' 'Jewish' 'Hindu' 'Jain']
+2025-04-26 20:44:20,381 - INFO - Mother Tongue: ['Gujarati' 'Telugu' 'Konkani' 'Sanskrit' 'Sindhi' 'Urdu' 'Punjabi'
+ 'Malayalam' 'Dogri' 'Marathi' 'Manipuri' 'Kashmiri' 'Hindi' 'Maithili'
+ 'Tamil' 'Bengali' 'Odia' 'Kannada' 'Nepali' 'Assamese']
+2025-04-26 20:44:20,382 - INFO - Marital Status: ['Never Married' 'Awaiting Divorce' 'Widowed' 'Divorced']
+2025-04-26 20:44:20,384 - INFO - Education: ['LLM' 'BFA' 'B.Music' 'BCom' 'M.Pharm' '10+2' 'M.Tech.' 'BHM' 'M.Arch'
+ 'B.Sc.' 'MD' 'B.Tech.' 'B.Pharm' 'M.Ed' 'BHMS' 'MCA' 'CA' 'B.Arch' 'MBA'
+ 'BAMS' 'MS' 'B.Com.' 'MFA' 'ICWA' 'M.A.' 'High School' 'BCA' 'LLB' 'B.A.'
+ 'BVSc' 'PhD' 'BBA' 'BDS' 'M.Sc.' 'CS' 'B.Ed' 'M.Com.' 'M.Music' 'MBBS'
+ 'Diploma']
+2025-04-26 20:44:20,385 - INFO - Income USD range: 3775.0 to 66250.0
+2025-04-26 20:44:20,385 - INFO - Height range: 150 to 180
+2025-04-26 20:44:20,387 - INFO - Weight range: 45 to 90
+2025-04-26 20:44:20,391 - INFO - After gender filter: 494 profiles
+2025-04-26 20:44:20,393 - INFO - After age filter: 383 profiles
+2025-04-26 20:44:20,394 - INFO - After religion filter: 60 profiles
+2025-04-26 20:44:20,395 - INFO - After mother tongue filter: 4 profiles
+2025-04-26 20:44:20,396 - INFO - After marital status filter: 2 profiles
+2025-04-26 20:44:20,396 - INFO - After education filter: 2 profiles
+2025-04-26 20:44:20,397 - INFO - After height filter: 2 profiles
+2025-04-26 20:44:20,397 - INFO - After weight filter: 2 profiles
+2025-04-26 20:44:20,397 - INFO - After income filter: 2 profiles
+2025-04-26 20:44:20,397 - INFO - Final number of candidates: 2
+2025-04-26 20:44:20,398 - INFO - Returning top 2 matches
+2025-04-26 20:47:58,311 - INFO - Received preferences: {
+  "preferences": {
+    "gender": "Male",
+    "age_range": [
+      20,
+      40
+    ],
+    "religion": "Hindu",
+    "mother_tongue": "Gujarati",
+    "marital_status": "Never Married",
+    "education": "B.E.",
+    "height_range": [
+      150,
+      190
+    ],
+    "weight_range": [
+      45,
+      90
+    ],
+    "income_range": [
+      "Any",
+      "Any"
+    ],
+    "family_type": "Any",
+    "occupation": "Professional"
+  }
+}
+2025-04-26 20:48:02,549 - INFO - Connected to MongoDB
+2025-04-26 20:48:04,369 - INFO - Found 1000 profiles
+2025-04-26 20:48:04,385 - INFO - Processed 1000 profiles with complete data
+2025-04-26 20:48:04,386 - INFO - Positive matches: 0
+2025-04-26 20:48:04,386 - INFO - Negative matches: 1000
+2025-04-26 20:48:04,389 - INFO - Received preferences: {
+  "gender": "Male",
+  "age_range": [
+    20,
+    40
+  ],
+  "religion": "Hindu",
+  "mother_tongue": "Gujarati",
+  "marital_status": "Never Married",
+  "education": "B.E.",
+  "height_range": [
+    150,
+    190
+  ],
+  "weight_range": [
+    45,
+    90
+  ],
+  "income_range": [
+    "Any",
+    "Any"
+  ],
+  "family_type": "Any",
+  "occupation": "Professional"
+}
+2025-04-26 20:48:04,389 - INFO - Initial number of profiles: 1000
+2025-04-26 20:48:04,389 - INFO - 
+Unique values in dataset:
+2025-04-26 20:48:04,390 - INFO - Gender: ['Male' 'Female']
+2025-04-26 20:48:04,390 - INFO - Religion: ['Muslim' 'Christian' 'Sikh' 'Parsi' 'Buddhist' 'Jewish' 'Hindu' 'Jain']
+2025-04-26 20:48:04,391 - INFO - Mother Tongue: ['Gujarati' 'Telugu' 'Konkani' 'Sanskrit' 'Sindhi' 'Urdu' 'Punjabi'
+ 'Malayalam' 'Dogri' 'Marathi' 'Manipuri' 'Kashmiri' 'Hindi' 'Maithili'
+ 'Tamil' 'Bengali' 'Odia' 'Kannada' 'Nepali' 'Assamese']
+2025-04-26 20:48:04,391 - INFO - Marital Status: ['Never Married' 'Awaiting Divorce' 'Widowed' 'Divorced']
+2025-04-26 20:48:04,392 - INFO - Education: ['LLM' 'BFA' 'B.Music' 'BCom' 'M.Pharm' '10+2' 'M.Tech.' 'BHM' 'M.Arch'
+ 'B.Sc.' 'MD' 'B.Tech.' 'B.Pharm' 'M.Ed' 'BHMS' 'MCA' 'CA' 'B.Arch' 'MBA'
+ 'BAMS' 'MS' 'B.Com.' 'MFA' 'ICWA' 'M.A.' 'High School' 'BCA' 'LLB' 'B.A.'
+ 'BVSc' 'PhD' 'BBA' 'BDS' 'M.Sc.' 'CS' 'B.Ed' 'M.Com.' 'M.Music' 'MBBS'
+ 'Diploma']
+2025-04-26 20:48:04,392 - INFO - Income USD range: 3775.0 to 66250.0
+2025-04-26 20:48:04,392 - INFO - Height range: 150 to 180
+2025-04-26 20:48:04,392 - INFO - Weight range: 45 to 90
+2025-04-26 20:48:04,394 - INFO - After gender filter: 494 profiles
+2025-04-26 20:48:04,395 - INFO - After age filter: 383 profiles
+2025-04-26 20:48:04,396 - INFO - After religion filter: 60 profiles
+2025-04-26 20:48:04,397 - INFO - After mother tongue filter: 4 profiles
+2025-04-26 20:48:04,397 - INFO - After marital status filter: 2 profiles
+2025-04-26 20:48:04,397 - INFO - After education filter: 2 profiles
+2025-04-26 20:48:04,398 - INFO - After height filter: 2 profiles
+2025-04-26 20:48:04,399 - INFO - After weight filter: 2 profiles
+2025-04-26 20:48:04,399 - INFO - After income filter: 2 profiles
+2025-04-26 20:48:04,400 - INFO - Final number of candidates: 2
+2025-04-26 20:48:04,401 - INFO - Returning top 2 matches

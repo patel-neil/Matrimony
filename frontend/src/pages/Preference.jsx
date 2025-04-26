@@ -22,14 +22,6 @@ const PartnerPreferencePage = () => {
     occupation: '',
   });
 
-  // Optional Preferences (Multi-selectable)
-  const [optionalPrefs, setOptionalPrefs] = useState({
-    hobbies: [],
-    foodPreferences: [],
-    location: [],
-    lifestyleChoices: []
-  });
-
   // Form validation state
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -82,12 +74,6 @@ const PartnerPreferencePage = () => {
             weight: data.essentialPrefs.weight || { min: 45, max: 90 },
             occupation: data.essentialPrefs.occupation || ''
           });
-          setOptionalPrefs(data.optionalPrefs || {
-            hobbies: [],
-            foodPreferences: [],
-            location: [],
-            lifestyleChoices: []
-          });
           setIsUpdate(true);
         }
       } catch (error) {
@@ -120,10 +106,6 @@ const PartnerPreferencePage = () => {
     ],
     familyType: ['Any', 'Nuclear', 'Joint', 'Extended', 'Single Parent'],
     occupation: ['Any', 'IT Professional', 'Doctor', 'Engineer', 'Teacher/Professor', 'Business Owner', 'Government Employee', 'Finance Professional', 'Lawyer', 'Artist', 'Self-Employed', 'Homemaker', 'Student', 'Professional', 'Service', 'Business', 'Other'],
-    hobbies: ['Any', 'Reading', 'Cooking', 'Traveling', 'Photography', 'Music', 'Dancing', 'Painting', 'Writing', 'Sports', 'Yoga', 'Meditation', 'Gardening', 'Hiking', 'Other'],
-    foodPreferences: ['Any', 'Vegetarian', 'Non-Vegetarian', 'Vegan', 'Eggetarian', 'Jain Food', 'Other'],
-    location: ['Any', 'North India', 'South India', 'East India', 'West India', 'Central India', 'Northeast India', 'Metro Cities', 'Tier 2 Cities', 'Rural Areas', 'Willing to Relocate', 'Other'],
-    lifestyleChoices: ['Any', 'Early Riser', 'Night Owl', 'Fitness Enthusiast', 'Homebody', 'Social Butterfly', 'Pet Lover', 'Environmentally Conscious', 'Minimalist', 'Other']
   };
 
   // Handle changes for essential preferences
@@ -145,24 +127,6 @@ const PartnerPreferencePage = () => {
     }));
   };
 
-  // Handle changes for optional preferences (multi-select)
-  const handleOptionalChange = (field, value) => {
-    setOptionalPrefs(prev => {
-      // If value is already selected, remove it
-      if (prev[field].includes(value)) {
-        return {
-          ...prev,
-          [field]: prev[field].filter(item => item !== value)
-        };
-      }
-      // Otherwise add it
-      return {
-        ...prev,
-        [field]: [...prev[field], value]
-      };
-    });
-  };
-
   // Form validation
   useEffect(() => {
     if (submitted) {
@@ -175,6 +139,13 @@ const PartnerPreferencePage = () => {
     
     // Only validate absolutely essential fields
     if (!essentialPrefs.gender) newErrors.gender = 'Gender is required';
+    if (!essentialPrefs.religion) newErrors.religion = 'Religion is required';
+    if (!essentialPrefs.motherTongue) newErrors.motherTongue = 'Mother tongue is required';
+    if (!essentialPrefs.maritalStatus) newErrors.maritalStatus = 'Marital status is required';
+    if (!essentialPrefs.education) newErrors.education = 'Education is required';
+    if (!essentialPrefs.income) newErrors.income = 'Income is required';
+    if (!essentialPrefs.familyType) newErrors.familyType = 'Family type is required';
+    if (!essentialPrefs.occupation) newErrors.occupation = 'Occupation is required';
     
     // Make other fields optional but validate ranges if provided
     if (essentialPrefs.ageRange.min >= essentialPrefs.ageRange.max) {
@@ -199,7 +170,7 @@ const PartnerPreferencePage = () => {
     setSubmitted(true);
 
     if (validateForm()) {
-      console.log("Submitting preferences:", { essentialPrefs, optionalPrefs });
+      console.log("Submitting preferences:", { essentialPrefs });
       savePreferences();
     } else {
       alert("Please fix the errors before submitting.");
@@ -220,13 +191,16 @@ const PartnerPreferencePage = () => {
       const response = await fetch(endpoint, {
         method: isUpdate ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, essentialPrefs, optionalPrefs }),
+        body: JSON.stringify({ userId, essentialPrefs }),
       });
 
       const data = await response.json();
       if (response.ok) {
         alert(isUpdate ? "Preferences updated!" : "Preferences saved!");
         setIsUpdate(true);
+        setTimeout(() => {
+          window.location.href = '/matches';
+        }, 2000);
       } else {
         alert(`Error: ${data.error || "Something went wrong"}`);
       }
@@ -544,105 +518,6 @@ const PartnerPreferencePage = () => {
             </div>
           </div>
           
-          {/* Optional Preferences Section */}
-          <div className="mb-10">
-            <h2 className="text-2xl font-serif text-rose-700 mb-6 pb-2 border-b border-rose-200">
-              Optional Preferences <span className="text-sm text-rose-500 font-sans">(Select multiple as applicable)</span>
-            </h2>
-            
-            {/* Hobbies */}
-            <div className="mb-8">
-              <fieldset>
-                <legend className="block text-gray-700 font-medium mb-2">Hobbies & Interests</legend>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                  {options.hobbies.map(hobby => (
-                    <div key={hobby} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`hobby-${hobby}`}
-                        checked={optionalPrefs.hobbies.includes(hobby)}
-                        onChange={() => handleOptionalChange('hobbies', hobby)}
-                        className="h-4 w-4 text-rose-600 rounded border-gray-300 focus:ring-rose-500"
-                      />
-                      <label htmlFor={`hobby-${hobby}`} className="ml-2 text-gray-700">
-                        {hobby}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
-            </div>
-            
-            {/* Food Preferences */}
-            <div className="mb-8">
-              <fieldset>
-                <legend className="block text-gray-700 font-medium mb-2">Food Preferences</legend>
-                <div className="flex flex-wrap gap-4">
-                  {options.foodPreferences.map(pref => (
-                    <div key={pref} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`food-${pref}`}
-                        checked={optionalPrefs.foodPreferences.includes(pref)}
-                        onChange={() => handleOptionalChange('foodPreferences', pref)}
-                        className="h-4 w-4 text-rose-600 rounded border-gray-300 focus:ring-rose-500"
-                      />
-                      <label htmlFor={`food-${pref}`} className="ml-2 text-gray-700">
-                        {pref}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
-            </div>
-            
-            {/* Location Preferences */}
-            <div className="mb-8">
-              <fieldset>
-                <legend className="block text-gray-700 font-medium mb-2">Location Preferences</legend>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {options.location.map(loc => (
-                    <div key={loc} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`location-${loc}`}
-                        checked={optionalPrefs.location.includes(loc)}
-                        onChange={() => handleOptionalChange('location', loc)}
-                        className="h-4 w-4 text-rose-600 rounded border-gray-300 focus:ring-rose-500"
-                      />
-                      <label htmlFor={`location-${loc}`} className="ml-2 text-gray-700">
-                        {loc}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
-            </div>
-            
-            {/* Lifestyle Choices */}
-            <div className="mb-6">
-              <fieldset>
-                <legend className="block text-gray-700 font-medium mb-2">Lifestyle Choices</legend>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {options.lifestyleChoices.map(choice => (
-                    <div key={choice} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`lifestyle-${choice}`}
-                        checked={optionalPrefs.lifestyleChoices.includes(choice)}
-                        onChange={() => handleOptionalChange('lifestyleChoices', choice)}
-                        className="h-4 w-4 text-rose-600 rounded border-gray-300 focus:ring-rose-500"
-                      />
-                      <label htmlFor={`lifestyle-${choice}`} className="ml-2 text-gray-700">
-                        {choice}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
-            </div>
-          </div>
-          
           {/* Preference Summary Card */}
           <div className="bg-rose-50 p-6 rounded-lg shadow-sm mb-8">
             <h3 className="text-xl font-serif text-rose-700 mb-4">Your Preference Summary</h3>
@@ -664,27 +539,6 @@ const PartnerPreferencePage = () => {
                   <li>Weight: {essentialPrefs.weight.min} - {essentialPrefs.weight.max} kg</li>
                 </ul>
               </div>
-              
-              {/* Only show optional preferences that have been selected */}
-              {Object.entries(optionalPrefs).some(([_, value]) => value.length > 0) && (
-                <div>
-                  <h4 className="font-medium text-gray-700">Optional Preferences</h4>
-                  <ul className="mt-2 space-y-1 text-gray-600">
-                    {optionalPrefs.hobbies.length > 0 && (
-                      <li>Hobbies & Interests: {optionalPrefs.hobbies.join(", ")}</li>
-                    )}
-                    {optionalPrefs.foodPreferences.length > 0 && (
-                      <li>Food Preferences: {optionalPrefs.foodPreferences.join(", ")}</li>
-                    )}
-                    {optionalPrefs.location.length > 0 && (
-                      <li>Location Preferences: {optionalPrefs.location.join(", ")}</li>
-                    )}
-                    {optionalPrefs.lifestyleChoices.length > 0 && (
-                      <li>Lifestyle Choices: {optionalPrefs.lifestyleChoices.join(", ")}</li>
-                    )}
-                  </ul>
-                </div>
-              )}
             </div>
           </div>
           
