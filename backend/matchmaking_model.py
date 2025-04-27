@@ -68,6 +68,9 @@ def get_profiles_from_mongodb():
         
         for profile in profiles:
             try:
+                # Convert ObjectId to string
+                profile_id = str(profile.get('_id'))
+                
                 processed_profile = {
                     'age': calculate_age(profile.get('dateOfBirth')),
                     'gender': profile.get('gender'),
@@ -85,7 +88,7 @@ def get_profiles_from_mongodb():
                     'location': 'Urban' if profile.get('city') in ['Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Chennai'] else 'Rural',
                     'lifestyle': profile.get('fitnessLevel'),
                     'full_name': f"{profile.get('firstName')} {profile.get('lastName')}",
-                    'user_id': profile.get('_id'),
+                    'user_id': profile_id,  # Use string version of ObjectId
                     'label': 1 if (
                         profile.get('gender') and
                         profile.get('religion') and
@@ -178,7 +181,7 @@ def train_matrimony_model(df):
         return None, None
 
 # Function to find the best matches
-def find_best_matches(preferences, data, model_pipeline=None, top_n=5):
+def find_best_matches(preferences, data, model_pipeline=None, top_n=10):
     try:
         logging.info("Received preferences: %s", json.dumps(preferences, indent=2))
         logging.info(f"Initial number of profiles: {len(data)}")
@@ -195,138 +198,126 @@ def find_best_matches(preferences, data, model_pipeline=None, top_n=5):
             'CA', 'CS', 'ICWA', 'LLB', 'LLM', 'PhD'
         ]
         
-        logging.info("\nUnique values in dataset:")
-        logging.info(f"Gender: {data['gender'].unique()}")
-        logging.info(f"Religion: {data['religion'].unique()}")
-        logging.info(f"Mother Tongue: {data['mother_tongue'].unique()}")
-        logging.info(f"Marital Status: {data['marital_status'].unique()}")
-        logging.info(f"Education: {data['education'].unique()}")
-        logging.info(f"Income USD range: {data['income_usd'].min()} to {data['income_usd'].max()}")
-        logging.info(f"Height range: {data['height_cm'].min()} to {data['height_cm'].max()}")
-        logging.info(f"Weight range: {data['weight_kg'].min()} to {data['weight_kg'].max()}")
-        
-        # Apply filters one by one
+        # Apply filters one by one with fallback options
         temp = data.copy()
+        original_count = len(temp)
         
-        # Gender filter
-        temp = temp[temp['gender'] != preferences['gender']]
-        logging.info(f"After gender filter: {len(temp)} profiles")
+        # Gender filter (mandatory) - Show profiles of same gender
+        temp = temp[temp['gender'] == preferences['gender']]
+        if len(temp) == 0:
+            logging.warning("No matches after gender filter, returning empty list")
+            return []
         
-        # Age filter
-        temp = temp[temp['age'].between(preferences['age_range'][0], preferences['age_range'][1])]
-        logging.info(f"After age filter: {len(temp)} profiles")
+        # Age filter with fallback
+        age_filtered = temp[temp['age'].between(preferences['age_range'][0], preferences['age_range'][1])]
+        if len(age_filtered) == 0:
+            # If no matches in age range, expand the range by 5 years
+            temp = temp[temp['age'].between(preferences['age_range'][0] - 5, preferences['age_range'][1] + 5)]
+        else:
+            temp = age_filtered
         
-        # Religion filter
+        # Religion filter - Skip if 'Any'
         if preferences['religion'] != 'Any':
             temp = temp[temp['religion'] == preferences['religion']]
-        logging.info(f"After religion filter: {len(temp)} profiles")
         
-        # Mother tongue filter
+        # Mother tongue filter - Skip if 'Any'
         if preferences['mother_tongue'] != 'Any':
             temp = temp[temp['mother_tongue'] == preferences['mother_tongue']]
-        logging.info(f"After mother tongue filter: {len(temp)} profiles")
         
-        # Marital status filter
+        # Marital status filter - Skip if 'Any'
         if preferences['marital_status'] != 'Any':
             temp = temp[temp['marital_status'].isin(marital_status_matches)]
-        logging.info(f"After marital status filter: {len(temp)} profiles")
         
-        # Education filter
+        # Education filter - Skip if 'Any'
         if preferences['education'] != 'Any':
             temp = temp[temp['education'].isin(education_matches)]
-        logging.info(f"After education filter: {len(temp)} profiles")
         
-        # Height filter
-        temp = temp[temp['height_cm'].between(preferences['height_range'][0], preferences['height_range'][1])]
-        logging.info(f"After height filter: {len(temp)} profiles")
-        
-        # Weight filter
-        temp = temp[temp['weight_kg'].between(preferences['weight_range'][0], preferences['weight_range'][1])]
-        logging.info(f"After weight filter: {len(temp)} profiles")
-        
-        # Income filter - handle 'Any' case
-        if preferences['income_range'][0] != 'Any':
-            # Convert income string to numeric value
-            def parse_income(income_str):
-                if income_str == 'Any':
-                    return None
-                try:
-                    # Remove currency symbol and convert to numeric
-                    income_str = income_str.replace('₹', '').strip()
-                    if 'Lakh' in income_str:
-                        return float(income_str.split()[0]) * 100000
-                    elif 'Crore' in income_str:
-                        return float(income_str.split()[0]) * 10000000
-                    return float(income_str)
-                except:
-                    return None
-            
-            min_income = parse_income(preferences['income_range'][0])
-            if min_income is not None:
-                temp = temp[temp['income_usd'] >= min_income]
-        logging.info(f"After income filter: {len(temp)} profiles")
-        
-        candidates = temp
-        
-        logging.info(f"Final number of candidates: {len(candidates)}")
-        
-        if len(candidates) == 0:
-            logging.warning("No candidates found matching preferences")
-            return {
-                "success": True,
-                "matches": [],
-                "debug": {
-                    "total_profiles": len(data),
-                    "filtered_profiles": 0
-                }
-            }
-        
-        if model_pipeline is not None:
-            try:
-                model_features = candidates.drop(columns=['label', 'user_id', 'full_name', 'match_probability'] 
-                                             if 'match_probability' in candidates.columns 
-                                             else ['label', 'user_id', 'full_name'])
-                
-                match_probs = model_pipeline.predict_proba(model_features)[:, 1]
-                candidates['match_probability'] = match_probs
-            except Exception as e:
-                logging.error(f"Error using model for prediction: {e}")
-                candidates['match_probability'] = 1.0
+        # Height filter with fallback
+        height_filtered = temp[temp['height_cm'].between(preferences['height_range'][0], preferences['height_range'][1])]
+        if len(height_filtered) == 0:
+            # If no matches in height range, expand the range by 10cm
+            temp = temp[temp['height_cm'].between(preferences['height_range'][0] - 10, preferences['height_range'][1] + 10)]
         else:
-            candidates['match_probability'] = 1.0
+            temp = height_filtered
         
-        top_matches = candidates.sort_values(by='match_probability', ascending=False).head(top_n)
+        # Weight filter with fallback
+        weight_filtered = temp[temp['weight_kg'].between(preferences['weight_range'][0], preferences['weight_range'][1])]
+        if len(weight_filtered) == 0:
+            # If no matches in weight range, expand the range by 10kg
+            temp = temp[temp['weight_kg'].between(preferences['weight_range'][0] - 10, preferences['weight_range'][1] + 10)]
+        else:
+            temp = weight_filtered
         
-        logging.info(f"Returning top {len(top_matches)} matches")
+        # Income filter - Skip if 'Any'
+        if preferences['income_range'][0] != 'Any':
+            def parse_income(income_str):
+                try:
+                    return float(income_str.replace('$', '').replace(',', ''))
+                except:
+                    return 0
+            
+            income_min = parse_income(preferences['income_range'][0])
+            income_max = parse_income(preferences['income_range'][1])
+            
+            income_filtered = temp[temp['income_usd'].between(income_min, income_max)]
+            if len(income_filtered) == 0:
+                # If no matches in income range, expand the range by 20%
+                temp = temp[temp['income_usd'].between(income_min * 0.8, income_max * 1.2)]
+            else:
+                temp = income_filtered
         
-        # Convert matches to JSON-serializable format
-        matches = []
-        for _, match in top_matches.iterrows():
-            # Convert Series to dictionary
-            match_dict = match.to_dict()
-            # Convert ObjectId to string
-            if 'user_id' in match_dict:
-                match_dict['user_id'] = str(match_dict['user_id'])
-            matches.append(match_dict)
+        # Family type filter - Skip if 'Any'
+        if preferences['family_type'] != 'Any':
+            temp = temp[temp['family_type'] == preferences['family_type']]
         
-        response = {
-            "success": True,
-            "matches": matches,
-            "debug": {
-                "total_profiles": len(data),
-                "filtered_profiles": len(matches)
-            }
-        }
+        # Occupation filter - Skip if 'Any'
+        if preferences['occupation'] != 'Any':
+            temp = temp[temp['occupation'] == preferences['occupation']]
         
-        return response
+        logging.info(f"Final number of matches: {len(temp)}")
         
+        # If we have matches, return them
+        if len(temp) > 0:
+            # Sort by multiple criteria to get the best matches
+            temp = temp.sort_values(
+                by=['income_usd', 'education', 'height_cm'],
+                ascending=[False, True, True]
+            )
+            
+            # Convert DataFrame to list of dictionaries and ensure all values are JSON serializable
+            matches = []
+            seen_ids = set()  # Track seen user IDs to avoid duplicates
+            
+            for _, row in temp.head(top_n).iterrows():
+                user_id = str(row['user_id'])
+                if user_id not in seen_ids:  # Only add if not seen before
+                    seen_ids.add(user_id)
+                    match = {
+                        'user_id': user_id,
+                        'full_name': str(row['full_name']),
+                        'age': int(row['age']),
+                        'gender': str(row['gender']),
+                        'religion': str(row['religion']),
+                        'mother_tongue': str(row['mother_tongue']),
+                        'marital_status': str(row['marital_status']),
+                        'education': str(row['education']),
+                        'height_cm': float(row['height_cm']),
+                        'weight_kg': float(row['weight_kg']),
+                        'income_usd': float(row['income_usd']),
+                        'family_type': str(row['family_type']),
+                        'occupation': str(row['occupation'])
+                    }
+                    matches.append(match)
+            
+            return matches
+        else:
+            logging.warning("No matches found after all filters")
+            return []
+            
     except Exception as e:
-        logging.error("Error in recommendation process: %s", str(e))
-        response = {
-            "success": False,
-            "error": str(e)
-        }
-        return response
+        logging.error(f"Error in find_best_matches: {e}")
+        logging.error(traceback.format_exc())
+        return []
 
 # Function to get user profile by ID
 def get_user_profile(user_id):
@@ -416,36 +407,38 @@ def main():
             data = get_profiles_from_mongodb()
             if data is None:
                 response = {
+                    "success": False,
                     "error": "Could not fetch profiles from database",
-                    "success": False
+                    "matches": []
                 }
                 print(json.dumps(response, ensure_ascii=False))
                 return
 
             matches = find_best_matches(preferences['preferences'], data)
-            if matches is not None:
-                print(json.dumps(matches, ensure_ascii=False))
+            if matches:
+                response = {
+                    "success": True,
+                    "matches": matches
+                }
             else:
                 response = {
-                    "error": "No matches found",
-                    "success": False,
-                    "debug": {
-                        "total_profiles": len(data),
-                        "filtered_profiles": 0
-                    }
+                    "success": True,
+                    "matches": []
                 }
-                print(json.dumps(response, ensure_ascii=False))
+            print(json.dumps(response, ensure_ascii=False))
         else:
             response = {
+                "success": False,
                 "error": "Please provide preferences using --recommend option",
-                "success": False
+                "matches": []
             }
             print(json.dumps(response, ensure_ascii=False))
     except Exception as e:
         logging.error("Error in recommendation process: %s", str(e))
         response = {
+            "success": False,
             "error": str(e),
-            "success": False
+            "matches": []
         }
         print(json.dumps(response, ensure_ascii=False))
 

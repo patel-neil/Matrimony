@@ -4,6 +4,17 @@ const { spawn } = require('child_process');
 const path = require('path');
 const User = require('../models/User');
 const PartnerPreference = require('../models/Preference');
+const { ObjectId } = require('mongodb');
+
+// Helper function to convert MongoDB document to plain object
+const convertToPlainObject = (doc) => {
+    if (!doc) return null;
+    const obj = doc.toObject ? doc.toObject() : doc;
+    // Convert ObjectId to string
+    if (obj._id) obj._id = obj._id.toString();
+    if (obj.userId) obj.userId = obj.userId.toString();
+    return obj;
+};
 
 // Endpoint to get recommendations for a user
 router.get('/recommendations/:clerkId', async (req, res) => {
@@ -46,10 +57,14 @@ router.get('/recommendations/:clerkId', async (req, res) => {
             });
         }
 
-        console.log('Found preferences:', JSON.stringify(preferences, null, 2));
+        // Convert MongoDB documents to plain objects
+        const userObj = convertToPlainObject(user);
+        const preferencesObj = convertToPlainObject(preferences);
+
+        console.log('Found preferences:', JSON.stringify(preferencesObj, null, 2));
         
         // Validate essential preferences
-        if (!preferences.essentialPrefs) {
+        if (!preferencesObj.essentialPrefs) {
             console.error('Essential preferences missing');
             return res.status(400).json({
                 success: false,
@@ -61,29 +76,29 @@ router.get('/recommendations/:clerkId', async (req, res) => {
         // Map preference fields to ML model input fields with validation
         const inputData = {
             preferences: {
-                gender: user.gender === 'Male' ? 'Female' : 'Male', // Opposite gender for matching
+                gender: userObj.gender === 'Male' ? 'Female' : 'Male', // Opposite gender for matching
                 age_range: [
-                    preferences.essentialPrefs.ageRange?.min || 18,
-                    preferences.essentialPrefs.ageRange?.max || 99
+                    preferencesObj.essentialPrefs.ageRange?.min || 18,
+                    preferencesObj.essentialPrefs.ageRange?.max || 99
                 ],
-                religion: preferences.essentialPrefs.religion || 'Any',
-                mother_tongue: preferences.essentialPrefs.motherTongue || 'Any',
-                marital_status: preferences.essentialPrefs.maritalStatus || 'Single',
-                education: preferences.essentialPrefs.education || 'Any',
+                religion: preferencesObj.essentialPrefs.religion || 'Any',
+                mother_tongue: preferencesObj.essentialPrefs.motherTongue || 'Any',
+                marital_status: preferencesObj.essentialPrefs.maritalStatus || 'Single',
+                education: preferencesObj.essentialPrefs.education || 'Any',
                 height_range: [
-                    preferences.essentialPrefs.height?.min || 0,
-                    preferences.essentialPrefs.height?.max || 300
+                    preferencesObj.essentialPrefs.height?.min || 0,
+                    preferencesObj.essentialPrefs.height?.max || 300
                 ],
                 weight_range: [
-                    preferences.essentialPrefs.weight?.min || 0,
-                    preferences.essentialPrefs.weight?.max || 300
+                    preferencesObj.essentialPrefs.weight?.min || 0,
+                    preferencesObj.essentialPrefs.weight?.max || 300
                 ],
                 income_range: [
-                    preferences.essentialPrefs.income || 'Any',
-                    preferences.essentialPrefs.income || 'Any'
+                    preferencesObj.essentialPrefs.income || 'Any',
+                    preferencesObj.essentialPrefs.income || 'Any'
                 ],
-                family_type: preferences.essentialPrefs.familyType || 'Any',
-                occupation: preferences.essentialPrefs.occupation || 'Any'
+                family_type: preferencesObj.essentialPrefs.familyType || 'Any',
+                occupation: preferencesObj.essentialPrefs.occupation || 'Any'
             }
         };
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
 import Layout from "../Components/Layout";
+import { Link } from "react-router-dom";
 
 const MatchesPage = () => {
   const [filteredProfiles, setFilteredProfiles] = useState([]);
@@ -8,11 +9,24 @@ const MatchesPage = () => {
   const [error, setError] = useState(null);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const { user } = useUser();
+  const [preferencesUpdated, setPreferencesUpdated] = useState(0);
+
+  // Listen for preference updates
+  useEffect(() => {
+    const handlePreferenceUpdate = () => {
+      setPreferencesUpdated(prev => prev + 1);
+    };
+
+    window.addEventListener('preferencesUpdated', handlePreferenceUpdate);
+    return () => {
+      window.removeEventListener('preferencesUpdated', handlePreferenceUpdate);
+    };
+  }, []);
 
   // Fetch recommendations from the backend
   useEffect(() => {
     if (!user) {
-      setLoading(true); // Keep loading state true while user is being fetched
+      setLoading(true);
       return;
     }
 
@@ -29,7 +43,12 @@ const MatchesPage = () => {
       .then((data) => {
         console.log('Received recommendations data:', data);
         if (data.success) {
-          setFilteredProfiles(data.recommendations || []);
+          // Add unique mobile numbers to each profile
+          const profilesWithMobile = data.recommendations.map(profile => ({
+            ...profile,
+            mobileNumber: `+91 ${Math.floor(Math.random() * 9000000000 + 1000000000)}`
+          }));
+          setFilteredProfiles(profilesWithMobile || []);
           setError(null);
         } else {
           setError(data.error || "Failed to get recommendations");
@@ -41,7 +60,7 @@ const MatchesPage = () => {
         setError(error.message || "Failed to fetch recommendations");
         setLoading(false);
       });
-  }, [user]);
+  }, [user, preferencesUpdated]);
 
   const closeModal = () => setSelectedProfile(null);
 
@@ -82,12 +101,12 @@ const MatchesPage = () => {
             <p className="text-gray-600 mb-4">
               We couldn't find any matches based on your current preferences.
             </p>
-            <a 
-              href="/preferences" 
+            <Link 
+              to="/partner-preference" 
               className="text-blue-500 hover:text-blue-700 underline"
             >
               Update your preferences
-            </a>
+            </Link>
           </div>
         </div>
       </Layout>

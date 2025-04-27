@@ -13,7 +13,7 @@ const Layout = ({ children }) => {
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <span className="text-2xl font-bold text-rose-600">Shadi.com</span>
+            <span className="text-2xl font-bold text-rose-600">PremSangam</span>
           </Link>
 
           {/* Navigation Links */}
